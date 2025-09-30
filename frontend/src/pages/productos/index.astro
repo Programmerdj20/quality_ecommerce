@@ -1,0 +1,188 @@
+---
+/**
+ * Catálogo de Productos - Página de listado completo
+ */
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProductGrid from '@/components/products/ProductGrid.astro';
+import { PLACEHOLDER_PRODUCTS, PLACEHOLDER_CATEGORIES } from '@/utils/api/placeholderData';
+
+// Obtener parámetros de filtro de la URL
+const url = new URL(Astro.request.url);
+const categoriaFiltro = url.searchParams.get('categoria');
+const ordenar = url.searchParams.get('orden') as 'precio-asc' | 'precio-desc' | 'nombre-asc' | null;
+
+// Filtrar productos
+let productosFiltrados = [...PLACEHOLDER_PRODUCTS].filter(p => p.activo);
+
+if (categoriaFiltro) {
+  productosFiltrados = productosFiltrados.filter(p => p.categoria === categoriaFiltro);
+}
+
+// Ordenar
+if (ordenar) {
+  switch (ordenar) {
+    case 'precio-asc':
+      productosFiltrados.sort((a, b) => {
+        const precioA = a.precioDescuento || a.precio;
+        const precioB = b.precioDescuento || b.precio;
+        return precioA - precioB;
+      });
+      break;
+    case 'precio-desc':
+      productosFiltrados.sort((a, b) => {
+        const precioA = a.precioDescuento || a.precio;
+        const precioB = b.precioDescuento || b.precio;
+        return precioB - precioA;
+      });
+      break;
+    case 'nombre-asc':
+      productosFiltrados.sort((a, b) => a.nombre.localeCompare(b.nombre));
+      break;
+  }
+}
+
+const categoriaActual = categoriaFiltro
+  ? PLACEHOLDER_CATEGORIES.find(c => c.slug === categoriaFiltro)
+  : null;
+
+const titulo = categoriaActual
+  ? `${categoriaActual.nombre} - Productos`
+  : 'Todos los Productos';
+---
+
+<BaseLayout title={titulo} description="Explora nuestro catálogo completo de productos">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Breadcrumbs -->
+    <nav class="text-sm mb-6">
+      <ol class="flex gap-2 text-text-secondary">
+        <li><a href="/" class="hover:text-primary">Inicio</a></li>
+        <li>/</li>
+        <li class={categoriaActual ? '' : 'text-text font-medium'}>
+          {categoriaActual ? <a href="/productos" class="hover:text-primary">Productos</a> : 'Productos'}
+        </li>
+        {categoriaActual && (
+          <>
+            <li>/</li>
+            <li class="text-text font-medium">{categoriaActual.nombre}</li>
+          </>
+        )}
+      </ol>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Sidebar de Filtros -->
+      <aside class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-md p-6 sticky top-20">
+          <h2 class="font-heading font-bold text-xl mb-6">Filtros</h2>
+
+          <!-- Categorías -->
+          <div class="mb-6">
+            <h3 class="font-semibold text-lg mb-3">Categorías</h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="/productos"
+                  class={`block px-3 py-2 rounded-lg transition-colors ${
+                    !categoriaFiltro
+                      ? 'bg-primary text-white'
+                      : 'hover:bg-gray-100'
+                  }`}
+                >
+                  Todas ({PLACEHOLDER_PRODUCTS.length})
+                </a>
+              </li>
+              {PLACEHOLDER_CATEGORIES.map((cat) => (
+                <li>
+                  <a
+                    href={`/productos?categoria=${cat.slug}`}
+                    class={`block px-3 py-2 rounded-lg transition-colors ${
+                      categoriaFiltro === cat.slug
+                        ? 'bg-primary text-white'
+                        : 'hover:bg-gray-100'
+                    }`}
+                  >
+                    {cat.nombre} ({cat.productCount})
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- Ordenar -->
+          <div>
+            <h3 class="font-semibold text-lg mb-3">Ordenar por</h3>
+            <select
+              id="orden-select"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              <option value="">Más relevantes</option>
+              <option value="precio-asc" selected={ordenar === 'precio-asc'}>
+                Precio: Menor a Mayor
+              </option>
+              <option value="precio-desc" selected={ordenar === 'precio-desc'}>
+                Precio: Mayor a Menor
+              </option>
+              <option value="nombre-asc" selected={ordenar === 'nombre-asc'}>
+                Nombre: A-Z
+              </option>
+            </select>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Productos -->
+      <main class="lg:col-span-3">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="font-heading font-bold text-3xl text-text mb-2">
+              {categoriaActual ? categoriaActual.nombre : 'Todos los Productos'}
+            </h1>
+            <p class="text-text-secondary">
+              {productosFiltrados.length} producto{productosFiltrados.length !== 1 ? 's' : ''} encontrado{productosFiltrados.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+        </div>
+
+        <!-- Grid de Productos -->
+        <ProductGrid products={productosFiltrados} columns={3} />
+
+        <!-- Mensaje de No Resultados -->
+        {productosFiltrados.length === 0 && (
+          <div class="text-center py-16">
+            <p class="text-text-secondary text-lg mb-4">
+              No se encontraron productos en esta categoría
+            </p>
+            <a
+              href="/productos"
+              class="inline-block px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Ver Todos los Productos
+            </a>
+          </div>
+        )}
+      </main>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Cambiar orden dinámicamente
+  const ordenSelect = document.getElementById('orden-select') as HTMLSelectElement;
+
+  ordenSelect?.addEventListener('change', (e) => {
+    const target = e.target as HTMLSelectElement;
+    const orden = target.value;
+
+    const url = new URL(window.location.href);
+
+    if (orden) {
+      url.searchParams.set('orden', orden);
+    } else {
+      url.searchParams.delete('orden');
+    }
+
+    window.location.href = url.toString();
+  });
+</script>

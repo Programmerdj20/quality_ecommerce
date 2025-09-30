@@ -1,0 +1,110 @@
+---
+/**
+ * CartItem - Item individual dentro del carrito
+ * Solo la estructura, la lógica se maneja con JavaScript del lado del cliente
+ */
+
+import type { CartItem } from '@/types';
+
+interface Props {
+  item: CartItem;
+}
+
+const { item } = Astro.props;
+
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+  }).format(price);
+};
+---
+
+<div
+  class="cart-item flex gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+  data-product-id={item.productId}
+>
+  <!-- Imagen del Producto -->
+  <div class="flex-shrink-0">
+    <img
+      src={item.imagen}
+      alt={item.nombre}
+      class="w-20 h-20 object-cover rounded-md"
+    />
+  </div>
+
+  <!-- Información del Producto -->
+  <div class="flex-1 min-w-0">
+    <h4 class="font-semibold text-text line-clamp-2 mb-1">
+      {item.nombre}
+    </h4>
+    <p class="text-sm text-text-secondary mb-2">
+      SKU: {item.sku}
+    </p>
+
+    <div class="flex items-center gap-4">
+      <!-- Controles de Cantidad -->
+      <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+        <button
+          class="decrement-btn w-7 h-7 flex items-center justify-center hover:bg-white rounded transition-colors"
+          data-product-id={item.productId}
+          aria-label="Disminuir cantidad"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+          </svg>
+        </button>
+
+        <span
+          class="item-quantity w-8 text-center font-semibold"
+          data-product-id={item.productId}
+        >
+          {item.cantidad}
+        </span>
+
+        <button
+          class="increment-btn w-7 h-7 flex items-center justify-center hover:bg-white rounded transition-colors"
+          data-product-id={item.productId}
+          data-stock={item.stockDisponible}
+          aria-label="Aumentar cantidad"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Precio Unitario -->
+      <div class="text-sm text-text-secondary">
+        {formatPrice(item.precio)} c/u
+      </div>
+    </div>
+
+    <!-- Stock disponible -->
+    {item.cantidad >= item.stockDisponible && (
+      <p class="text-xs text-orange-600 mt-1">
+        Stock máximo alcanzado
+      </p>
+    )}
+  </div>
+
+  <!-- Precio Total y Botón Eliminar -->
+  <div class="flex flex-col items-end justify-between">
+    <button
+      class="remove-btn text-text-secondary hover:text-red-600 transition-colors p-1"
+      data-product-id={item.productId}
+      aria-label="Eliminar producto"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <div class="text-right">
+      <p class="font-bold text-lg text-primary item-total" data-product-id={item.productId}>
+        {formatPrice(item.precio * item.cantidad)}
+      </p>
+    </div>
+  </div>
+</div>

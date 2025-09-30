@@ -1,0 +1,181 @@
+---
+/**
+ * Header - Cabecera del sitio con navegación
+ */
+
+import Navigation from './Navigation.astro';
+---
+
+<header class="sticky top-0 z-50 bg-background border-b border-gray-200 shadow-sm">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2 group">
+        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl group-hover:bg-secondary transition-colors">
+          QE
+        </div>
+        <span class="font-heading font-bold text-xl text-text hidden sm:block">
+          Quality <span class="text-primary">Ecommerce</span>
+        </span>
+      </a>
+
+      <!-- Navegación Desktop -->
+      <Navigation />
+
+      <!-- Carrito y Acciones -->
+      <div class="flex items-center gap-4">
+        <!-- Botón Carrito -->
+        <button
+          id="cart-trigger"
+          class="relative p-2 hover:bg-gray-100 rounded-full transition-colors group"
+          aria-label="Abrir carrito de compras"
+        >
+          <svg
+            class="w-6 h-6 text-text group-hover:text-primary transition-colors"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+            ></path>
+          </svg>
+          <!-- Badge contador (se actualizará con JavaScript) -->
+          <span
+            id="cart-count"
+            class="absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full min-w-5 h-5 px-1 flex items-center justify-center hidden animate-bounce"
+          >
+            0
+          </span>
+        </button>
+
+        <!-- Botón Usuario -->
+        <a
+          href="/cuenta/login"
+          class="p-2 hover:bg-gray-100 rounded-full transition-colors group"
+          aria-label="Mi cuenta"
+        >
+          <svg
+            class="w-6 h-6 text-text group-hover:text-primary transition-colors"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            ></path>
+          </svg>
+        </a>
+
+        <!-- Menú Mobile Toggle -->
+        <button
+          id="mobile-menu-toggle"
+          class="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          aria-label="Abrir menú"
+        >
+          <svg
+            class="w-6 h-6 text-text"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menú Mobile (oculto por defecto) -->
+  <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 bg-background">
+    <nav class="container mx-auto px-4 py-4">
+      <ul class="space-y-2">
+        <li>
+          <a
+            href="/"
+            class="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-text"
+          >
+            Inicio
+          </a>
+        </li>
+        <li>
+          <a
+            href="/productos"
+            class="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-text"
+          >
+            Productos
+          </a>
+        </li>
+        <li>
+          <a
+            href="/productos/tecnologia"
+            class="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-text-secondary"
+          >
+            Tecnología
+          </a>
+        </li>
+        <li>
+          <a
+            href="/productos/hogar"
+            class="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-text-secondary"
+          >
+            Hogar
+          </a>
+        </li>
+        <li>
+          <a
+            href="/productos/moda"
+            class="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-text-secondary"
+          >
+            Moda
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  import { cartStore } from '@/stores/cartStore';
+
+  // Toggle menú mobile
+  const toggle = document.getElementById('mobile-menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+
+  toggle?.addEventListener('click', () => {
+    menu?.classList.toggle('hidden');
+  });
+
+  // Cart trigger - abrir drawer
+  const cartTrigger = document.getElementById('cart-trigger');
+  cartTrigger?.addEventListener('click', () => {
+    if (typeof (window as any).openCart === 'function') {
+      (window as any).openCart();
+    }
+  });
+
+  // Actualizar badge del carrito
+  const cartBadge = document.getElementById('cart-count');
+  cartStore.subscribe((cart) => {
+    if (cartBadge) {
+      cartBadge.textContent = cart.itemCount.toString();
+
+      if (cart.itemCount > 0) {
+        cartBadge.classList.remove('hidden');
+      } else {
+        cartBadge.classList.add('hidden');
+      }
+    }
+  });
+</script>

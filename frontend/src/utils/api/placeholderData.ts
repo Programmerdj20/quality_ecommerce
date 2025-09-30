@@ -223,11 +223,11 @@ export const PLACEHOLDER_THEMES: Theme[] = [
     nombre: 'Default',
     slug: 'default',
     colores: {
-      primary: '#2563eb',
-      secondary: '#7c3aed',
-      accent: '#f59e0b',
+      primary: '#1d4ed8',
+      secondary: '#6d28d9',
+      accent: '#ea580c',
       background: '#ffffff',
-      text: '#1f2937',
+      text: '#111827',
       textSecondary: '#6b7280'
     },
     tipografias: {

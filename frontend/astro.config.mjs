@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'hybrid', // Permite SSG + SSR selectivo
+  output: 'static', // Genera sitio estático
   server: {
     port: 4321,
     host: true

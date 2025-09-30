@@ -1,16 +1,363 @@
 ---
+/**
+ * Home Page - Página principal del e-commerce
+ */
 
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProductGrid from '@/components/products/ProductGrid.astro';
+import { PLACEHOLDER_PRODUCTS, PLACEHOLDER_CATEGORIES } from '@/utils/api/placeholderData';
+
+// Obtener productos destacados (con descuento)
+const productosDestacados = PLACEHOLDER_PRODUCTS.filter(
+  p => p.precioDescuento && p.activo
+).slice(0, 6);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="Inicio - Quality Ecommerce"
+  description="Encuentra los mejores productos en tecnología, hogar y moda. Envíos a toda Colombia con los mejores precios."
+>
+  <!-- Hero Banner -->
+  <section class="relative bg-gradient-to-r from-primary to-secondary text-white overflow-hidden">
+    <!-- Patrón de fondo animado -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="hero-pattern absolute inset-0"></div>
+    </div>
+
+    <!-- Formas decorativas animadas -->
+    <div class="absolute top-20 right-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-float"></div>
+    <div class="absolute bottom-20 left-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float-delayed"></div>
+
+    <div class="container mx-auto px-4 py-20 md:py-32 relative z-10">
+      <div class="max-w-3xl">
+        <h1 class="font-heading font-bold text-4xl md:text-6xl mb-6 leading-tight animate-fade-in-up">
+          ¡Ofertas de Lanzamiento!
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 text-white/90 animate-fade-in-up animation-delay-200">
+          Hasta <span class="font-bold text-accent text-3xl md:text-4xl inline-block animate-pulse-scale">40% de descuento</span> en productos seleccionados
+        </p>
+        <div class="flex flex-wrap gap-4 animate-fade-in-up animation-delay-400">
+          <a
+            href="/productos"
+            class="inline-block bg-accent text-white font-bold px-8 py-4 rounded-lg hover:bg-accent/90 transition-all hover:shadow-xl transform hover:scale-105 active:scale-95 border-2 border-accent hover:border-white/50"
+          >
+            Ver Todos los Productos
+          </a>
+          <a
+            href="/productos/tecnologia"
+            class="inline-block bg-white/10 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-lg hover:bg-white/20 transition-all border-2 border-white/30 hover:border-white"
+          >
+            Explorar Tecnología
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decoración geométrica -->
+    <div class="absolute bottom-0 right-0 opacity-10 animate-spin-slow">
+      <svg class="w-64 h-64 md:w-96 md:h-96" viewBox="0 0 200 200" fill="currentColor">
+        <circle cx="100" cy="100" r="80" />
+        <circle cx="100" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="2" />
+        <circle cx="100" cy="100" r="40" fill="none" stroke="currentColor" stroke-width="2" />
+      </svg>
+    </div>
+  </section>
+
+  <style>
+    /* Animaciones del Hero */
+    @keyframes fade-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+      }
+      50% {
+        transform: translateY(-20px) translateX(10px);
+      }
+    }
+
+    @keyframes pulse-scale {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes spin-slow {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .animate-fade-in-up {
+      animation: fade-in-up 0.8s ease-out forwards;
+    }
+
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .animate-float-delayed {
+      animation: float 8s ease-in-out infinite;
+      animation-delay: 1s;
+    }
+
+    .animate-pulse-scale {
+      animation: pulse-scale 2s ease-in-out infinite;
+    }
+
+    .animate-spin-slow {
+      animation: spin-slow 30s linear infinite;
+    }
+
+    .animation-delay-200 {
+      animation-delay: 0.2s;
+      opacity: 0;
+    }
+
+    .animation-delay-400 {
+      animation-delay: 0.4s;
+      opacity: 0;
+    }
+
+    /* Patrón de fondo */
+    .hero-pattern {
+      background-image:
+        linear-gradient(30deg, transparent 45%, rgba(255,255,255,.03) 45%, rgba(255,255,255,.03) 55%, transparent 55%),
+        linear-gradient(150deg, transparent 45%, rgba(255,255,255,.03) 45%, rgba(255,255,255,.03) 55%, transparent 55%);
+      background-size: 60px 60px;
+    }
+
+    /* Animaciones generales */
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slide-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fade-in 0.6s ease-out forwards;
+    }
+
+    .animation-delay-100 {
+      animation-delay: 0.1s;
+      opacity: 0;
+    }
+
+    .animation-delay-200 {
+      animation-delay: 0.2s;
+      opacity: 0;
+    }
+
+    /* Animación de categorías */
+    .category-card {
+      animation: slide-in-up 0.6s ease-out forwards;
+    }
+
+    /* Animación de productos destacados */
+    .products-grid-animated > * > * {
+      animation: slide-in-up 0.6s ease-out forwards;
+      opacity: 0;
+    }
+
+    .products-grid-animated > * > *:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .products-grid-animated > * > *:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .products-grid-animated > * > *:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .products-grid-animated > * > *:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .products-grid-animated > * > *:nth-child(5) {
+      animation-delay: 0.5s;
+    }
+
+    .products-grid-animated > * > *:nth-child(6) {
+      animation-delay: 0.6s;
+    }
+  </style>
+
+  <!-- Categorías -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="font-heading font-bold text-3xl md:text-4xl text-text mb-4 animate-fade-in">
+          Explora por Categorías
+        </h2>
+        <p class="text-text-secondary text-lg max-w-2xl mx-auto animate-fade-in animation-delay-100">
+          Encuentra lo que necesitas en nuestras categorías especializadas
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {PLACEHOLDER_CATEGORIES.map((categoria, index) => (
+          <a
+            href={`/productos/${categoria.slug}`}
+            class="category-card group relative overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:scale-105 opacity-0"
+            style={`animation-delay: ${index * 100 + 200}ms`}
+          >
+            <div class="aspect-[4/3] relative">
+              <img
+                src={categoria.imagen}
+                alt={categoria.nombre}
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent group-hover:from-black/80 transition-colors"></div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 p-6 text-white transform group-hover:translate-y-0 transition-transform">
+              <h3 class="font-heading font-bold text-2xl mb-2">
+                {categoria.nombre}
+              </h3>
+              <p class="text-sm text-white/80 mb-2">
+                {categoria.descripcion}
+              </p>
+              <div class="flex items-center gap-2 text-sm font-medium">
+                <span>{categoria.productCount} productos</span>
+                <svg class="w-5 h-5 transform group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Productos Destacados -->
+  <section class="py-16 featured-products-section">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between mb-12">
+        <div>
+          <h2 class="font-heading font-bold text-3xl md:text-4xl text-text mb-2 animate-fade-in">
+            Productos Destacados
+          </h2>
+          <p class="text-text-secondary text-lg animate-fade-in animation-delay-100">
+            Aprovecha nuestras mejores ofertas
+          </p>
+        </div>
+        <a
+          href="/productos"
+          class="hidden md:inline-flex items-center gap-2 text-primary font-semibold hover:gap-3 transition-all animate-fade-in animation-delay-200"
+        >
+          Ver todos
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="products-grid-animated">
+        <ProductGrid products={productosDestacados} columns={3} />
+      </div>
+
+      <div class="text-center mt-12 md:hidden">
+        <a
+          href="/productos"
+          class="inline-flex items-center gap-2 text-primary font-semibold text-lg hover:gap-3 transition-all"
+        >
+          Ver todos los productos
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Beneficios -->
+  <section class="py-16 bg-primary text-white">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Envío Gratis -->
+        <div class="text-center">
+          <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+            </svg>
+          </div>
+          <h3 class="font-heading font-bold text-xl mb-2">Envío Gratis</h3>
+          <p class="text-white/80">En compras superiores a $150.000</p>
+        </div>
+
+        <!-- Pago Seguro -->
+        <div class="text-center">
+          <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <h3 class="font-heading font-bold text-xl mb-2">Pago Seguro</h3>
+          <p class="text-white/80">Con Mercado Pago, el más confiable</p>
+        </div>
+
+        <!-- Garantía -->
+        <div class="text-center">
+          <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-heading font-bold text-xl mb-2">Garantía</h3>
+          <p class="text-white/80">30 días de devolución garantizada</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Final -->
+  <section class="py-20 bg-gradient-to-br from-secondary to-primary text-white">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="font-heading font-bold text-3xl md:text-5xl mb-6">
+        ¿Listo para Comprar?
+      </h2>
+      <p class="text-xl md:text-2xl mb-8 text-white/90 max-w-2xl mx-auto">
+        Descubre miles de productos con los mejores precios y envío a toda Colombia
+      </p>
+      <a
+        href="/productos"
+        class="inline-block bg-accent text-white font-bold px-10 py-5 rounded-lg text-lg hover:bg-accent/90 transition-all hover:shadow-2xl transform hover:scale-105"
+      >
+        Explorar Catálogo Completo
+      </a>
+    </div>
+  </section>
+</BaseLayout>

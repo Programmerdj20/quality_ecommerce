@@ -1,0 +1,111 @@
+---
+/**
+ * BaseLayout - Layout principal del sitio
+ * Incluye ThemeProvider, Header, Footer y estilos globales
+ */
+
+import ThemeProvider from '@/components/theme/ThemeProvider.astro';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+import CartDrawer from '@/components/cart/CartDrawer.astro';
+import ToastContainer from '@/components/toast/ToastContainer.astro';
+import '@/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  showHeader?: boolean;
+  showFooter?: boolean;
+}
+
+const {
+  title = 'Quality Ecommerce - Tienda Online en Colombia',
+  description = 'Encuentra los mejores productos al mejor precio. Envíos a toda Colombia.',
+  showHeader = true,
+  showFooter = true
+} = Astro.props;
+
+const siteName = 'Quality Ecommerce';
+const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+---
+
+<!DOCTYPE html>
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Theme Provider (carga fuentes y CSS variables) -->
+    <ThemeProvider />
+
+    <!-- Title -->
+    <title>{fullTitle}</title>
+
+    <!-- Slot para meta tags adicionales desde páginas -->
+    <slot name="head" />
+  </head>
+
+  <body class="min-h-screen flex flex-col bg-background text-text">
+    <!-- Header -->
+    {showHeader && <Header />}
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    {showFooter && <Footer />}
+
+    <!-- Cart Drawer (global) -->
+    <CartDrawer />
+
+    <!-- Toast Container (global) -->
+    <ToastContainer />
+
+    <!-- Botón Volver Arriba -->
+    <button
+      id="scroll-to-top"
+      class="fixed bottom-6 right-6 w-12 h-12 bg-primary text-white rounded-full shadow-lg hover:bg-primary/90 transition-all opacity-0 pointer-events-none z-40 flex items-center justify-center"
+      aria-label="Volver arriba"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+      </svg>
+    </button>
+
+    <!-- Slot para scripts adicionales -->
+    <slot name="scripts" />
+
+    <!-- Script para botón scroll to top -->
+    <script>
+      const scrollBtn = document.getElementById('scroll-to-top');
+
+      // Mostrar/ocultar botón según scroll
+      window.addEventListener('scroll', () => {
+        if (scrollBtn) {
+          if (window.scrollY > 300) {
+            scrollBtn.classList.remove('opacity-0', 'pointer-events-none');
+            scrollBtn.classList.add('opacity-100');
+          } else {
+            scrollBtn.classList.add('opacity-0', 'pointer-events-none');
+            scrollBtn.classList.remove('opacity-100');
+          }
+        }
+      });
+
+      // Scroll suave al top
+      scrollBtn?.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    </script>
+  </body>
+</html>
