@@ -1,0 +1,26 @@
+{
+  "name": "quality-ecommerce-backend",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Backend Strapi para Quality Ecommerce",
+  "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi"
+  },
+  "dependencies": {
+    "@strapi/strapi": "^5.5.0",
+    "@strapi/plugin-users-permissions": "^5.5.0",
+    "@strapi/plugin-i18n": "^5.5.0",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=22.x.x",
+    "npm": ">=6.0.0"
+  }
+}

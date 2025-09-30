@@ -1,0 +1,35 @@
+---
+/**
+ * ThemeProvider - Componente que carga y aplica el tema activo
+ * Se incluye en todos los layouts para inyectar CSS Variables y fuentes
+ */
+
+import { loadSiteConfig, generateCSSVariables, getGoogleFontsUrl } from '@/utils/theme/themeLoader';
+
+// Cargar configuración del sitio con tema activo
+const config = await loadSiteConfig();
+const theme = config.temaActivo;
+
+// Generar CSS Variables
+const cssVars = generateCSSVariables(theme);
+
+// URL de Google Fonts
+const googleFontsUrl = getGoogleFontsUrl(theme);
+---
+
+<!-- Preconnect para mejor performance -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<!-- Cargar Google Fonts -->
+<link href={googleFontsUrl} rel="stylesheet" />
+
+<!-- Inyectar CSS Variables del tema -->
+<style is:global set:html={cssVars}></style>
+
+<!-- Script para hacer config disponible globalmente -->
+<script define:vars={{ config, theme }}>
+  // Hacer configuración disponible para JavaScript del cliente
+  window.__SITE_CONFIG__ = config;
+  window.__ACTIVE_THEME__ = theme;
+</script>
