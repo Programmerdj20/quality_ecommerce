@@ -1,0 +1,346 @@
+---
+/**
+ * ProductCarousel - Carrusel responsive de productos
+ * Desktop: Grid estático 2 filas x 4 columnas
+ * Tablet: Carrusel 1 fila x 3 productos por slide
+ * Mobile: Carrusel 1 fila x 2 productos por slide
+ */
+
+import type { Product } from '@/types';
+import ProductCard from './ProductCard.astro';
+
+interface Props {
+  products: Product[];
+  emptyMessage?: string;
+}
+
+const {
+  products,
+  emptyMessage = 'No se encontraron productos'
+} = Astro.props;
+
+// Generar ID único para este carrusel
+const carouselId = `product-carousel-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+{products.length > 0 ? (
+  <div class="product-carousel-wrapper">
+    <!-- Desktop: Grid estático 2x4 con animación de scroll -->
+    <div class="hidden xl:grid xl:grid-cols-4 gap-6">
+      {products.map((product, index) => {
+        const row = Math.floor(index / 4) + 1; // Fila 1 o 2
+        const colInRow = index % 4; // Posición en la fila (0-3)
+        return (
+          <div
+            class="product-card-scroll-animate"
+            data-row={row}
+            data-col={colInRow}
+            style={`--animation-delay: ${colInRow * 0.1}s`}
+          >
+            <ProductCard product={product} />
+          </div>
+        );
+      })}
+    </div>
+
+    <!-- Tablet/Mobile: Carrusel con scroll-snap -->
+    <div class="xl:hidden relative">
+      <!-- Contenedor del carrusel -->
+      <div
+        id={carouselId}
+        class="carousel-container flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar pb-4"
+      >
+        {products.map((product) => (
+          <div class="carousel-item flex-none snap-start w-[calc(50%-12px)] md:w-[calc(33.333%-16px)]">
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </div>
+
+      <!-- Botones de navegación (solo visible en hover) -->
+      <button
+        class="carousel-btn carousel-prev absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-10 group-hover:opacity-100"
+        aria-label="Anterior"
+        data-carousel={carouselId}
+        data-direction="prev"
+      >
+        <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <button
+        class="carousel-btn carousel-next absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-10 group-hover:opacity-100"
+        aria-label="Siguiente"
+        data-carousel={carouselId}
+        data-direction="next"
+      >
+        <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+
+      <!-- Indicadores de scroll -->
+      <div class="flex justify-center gap-2 mt-4">
+        {Array.from({ length: Math.ceil(products.length / 2) }).map((_, index) => (
+          <button
+            class="carousel-indicator w-2 h-2 rounded-full bg-gray-300 transition-all hover:bg-gray-400"
+            data-carousel={carouselId}
+            data-index={index}
+            aria-label={`Ir a grupo ${index + 1}`}
+          ></button>
+        ))}
+      </div>
+    </div>
+  </div>
+) : (
+  <div class="text-center py-16">
+    <svg
+      class="w-24 h-24 mx-auto text-gray-300 mb-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.5"
+        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+      />
+    </svg>
+    <p class="text-gray-600 text-lg font-medium">{emptyMessage}</p>
+  </div>
+)}
+
+<script>
+  // Intersection Observer para animaciones de scroll en desktop
+  if (typeof window !== 'undefined') {
+    const observeProducts = () => {
+      const productCards = document.querySelectorAll('.product-card-scroll-animate');
+
+      if (productCards.length === 0) return;
+
+      const observerOptions = {
+        root: null,
+        rootMargin: '-50px',
+        threshold: 0.1
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target); // Animar solo una vez
+          }
+        });
+      }, observerOptions);
+
+      productCards.forEach((card) => {
+        observer.observe(card);
+      });
+    };
+
+    // Ejecutar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', observeProducts);
+    } else {
+      observeProducts();
+    }
+  }
+
+  // Funcionalidad del carrusel
+  document.addEventListener('DOMContentLoaded', () => {
+    const carousels = document.querySelectorAll('.carousel-container');
+
+    carousels.forEach((carousel) => {
+      const carouselId = carousel.id;
+      const prevBtn = document.querySelector(`.carousel-prev[data-carousel="${carouselId}"]`);
+      const nextBtn = document.querySelector(`.carousel-next[data-carousel="${carouselId}"]`);
+      const indicators = document.querySelectorAll(`.carousel-indicator[data-carousel="${carouselId}"]`);
+      let autoScrollInterval: number | null = null;
+
+      // Scroll del carrusel
+      function scrollCarousel(direction: 'prev' | 'next') {
+        const scrollAmount = carousel.clientWidth * 0.8;
+        const currentScroll = carousel.scrollLeft;
+
+        if (direction === 'prev') {
+          carousel.scrollTo({
+            left: currentScroll - scrollAmount,
+            behavior: 'smooth'
+          });
+        } else {
+          carousel.scrollTo({
+            left: currentScroll + scrollAmount,
+            behavior: 'smooth'
+          });
+        }
+      }
+
+      // Auto-scroll cada 5 segundos
+      function startAutoScroll() {
+        autoScrollInterval = window.setInterval(() => {
+          const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+          const currentScroll = carousel.scrollLeft;
+
+          if (currentScroll >= maxScroll - 10) {
+            // Al final, volver al inicio
+            carousel.scrollTo({ left: 0, behavior: 'smooth' });
+          } else {
+            // Avanzar
+            scrollCarousel('next');
+          }
+        }, 5000);
+      }
+
+      function stopAutoScroll() {
+        if (autoScrollInterval) {
+          clearInterval(autoScrollInterval);
+          autoScrollInterval = null;
+        }
+      }
+
+      // Event listeners de botones
+      prevBtn?.addEventListener('click', () => {
+        stopAutoScroll();
+        scrollCarousel('prev');
+        startAutoScroll();
+      });
+
+      nextBtn?.addEventListener('click', () => {
+        stopAutoScroll();
+        scrollCarousel('next');
+        startAutoScroll();
+      });
+
+      // Event listeners de indicadores
+      indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => {
+          stopAutoScroll();
+          const itemWidth = carousel.querySelector('.carousel-item')?.clientWidth || 0;
+          const gap = 24; // gap-6 = 24px
+          const scrollPosition = (itemWidth + gap) * index * 2; // x2 porque son 2 items por vista en mobile
+
+          carousel.scrollTo({
+            left: scrollPosition,
+            behavior: 'smooth'
+          });
+          startAutoScroll();
+        });
+      });
+
+      // Actualizar indicadores activos según scroll
+      carousel.addEventListener('scroll', () => {
+        const scrollLeft = carousel.scrollLeft;
+        const itemWidth = carousel.querySelector('.carousel-item')?.clientWidth || 0;
+        const gap = 24;
+        const currentIndex = Math.round(scrollLeft / ((itemWidth + gap) * 2));
+
+        indicators.forEach((indicator, index) => {
+          if (index === currentIndex) {
+            indicator.classList.remove('bg-gray-300');
+            indicator.classList.add('bg-black', 'w-8');
+          } else {
+            indicator.classList.add('bg-gray-300');
+            indicator.classList.remove('bg-black', 'w-8');
+          }
+        });
+      });
+
+      // Pausar autoplay en hover, reanudar al salir
+      carousel.addEventListener('mouseenter', stopAutoScroll);
+      carousel.addEventListener('mouseleave', startAutoScroll);
+
+      // Iniciar autoplay
+      startAutoScroll();
+    });
+
+    // Mostrar botones en hover del contenedor
+    const wrappers = document.querySelectorAll('.product-carousel-wrapper');
+    wrappers.forEach((wrapper) => {
+      wrapper.addEventListener('mouseenter', () => {
+        const buttons = wrapper.querySelectorAll('.carousel-btn');
+        buttons.forEach((btn) => {
+          btn.classList.remove('opacity-0');
+          btn.classList.add('opacity-100');
+        });
+      });
+
+      wrapper.addEventListener('mouseleave', () => {
+        const buttons = wrapper.querySelectorAll('.carousel-btn');
+        buttons.forEach((btn) => {
+          btn.classList.add('opacity-0');
+          btn.classList.remove('opacity-100');
+        });
+      });
+    });
+  });
+</script>
+
+<style>
+  /* Ocultar scrollbar pero mantener funcionalidad */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Smooth snap */
+  .carousel-container {
+    scroll-padding: 0;
+  }
+
+  /* Indicador activo más ancho */
+  .carousel-indicator {
+    transition: all 0.3s ease;
+  }
+
+  /* Animaciones de scroll para productos desktop */
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-60px) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(60px) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) translateY(0);
+    }
+  }
+
+  /* Estado inicial de las tarjetas */
+  .product-card-scroll-animate {
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  /* Animación para fila 1 (desde la izquierda) */
+  .product-card-scroll-animate[data-row="1"].is-visible {
+    animation: slideInLeft 0.8s ease-out forwards;
+    animation-delay: var(--animation-delay);
+  }
+
+  /* Animación para fila 2 (desde la derecha) */
+  .product-card-scroll-animate[data-row="2"].is-visible {
+    animation: slideInRight 0.8s ease-out forwards;
+    animation-delay: var(--animation-delay);
+  }
+
+  /* Limpieza después de animar */
+  .product-card-scroll-animate.is-visible {
+    will-change: auto;
+  }
+</style>
