@@ -32,13 +32,7 @@ export interface Theme {
 
 export interface Banner {
   id: string;
-  imagen: string;
-  titulo: string;
-  subtitulo?: string;
-  cta?: {
-    texto: string;
-    url: string;
-  };
+  imagen: string; // URL de la imagen completa del banner (incluye diseño, texto, botones)
   orden: number;
   activo: boolean;
 }

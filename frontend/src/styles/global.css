@@ -1,16 +1,29 @@
 @import "tailwindcss";
 
 /* Variables CSS por defecto (se sobrescriben con el tema activo) */
+/* Paleta Minimalista Premium - Blanco/Negro/Grises */
 :root {
-  --color-primary: #1d4ed8;
-  --color-secondary: #6d28d9;
-  --color-accent: #ea580c;
-  --color-background: #ffffff;
-  --color-text: #111827;
-  --color-text-secondary: #6b7280;
+  /* Escala de Grises Base */
+  --color-white-pure: #FFFFFF;      /* Tarjetas, superficies, contenido destacado */
+  --color-white-smoke: #F5F5F5;     /* Fondo principal del sitio */
+  --color-gray-light: #D9D9D9;      /* Bordes, divisores, backgrounds secundarios */
+  --color-gray-medium: #7A7A7A;     /* Texto secundario, placeholders, iconos neutros */
+  --color-gray-dark: #2E2E2E;       /* Texto principal, headers, elementos fuertes */
+  --color-black: #000000;           /* Botones primarios, acentos, máxima jerarquía */
 
+  /* Aliases Semánticos para Componentes */
+  --color-primary: #000000;         /* Negro para botones primarios y CTA */
+  --color-secondary: #2E2E2E;       /* Gris oscuro para elementos secundarios */
+  --color-accent: #000000;          /* Negro para acentos importantes */
+  --color-background: #F5F5F5;      /* White smoke - Fondo principal del sitio */
+  --color-surface: #FFFFFF;         /* White pure - Superficies como cards */
+  --color-border: #D9D9D9;          /* Gris claro - Bordes y líneas divisorias */
+  --color-text: #2E2E2E;           /* Gris oscuro - Texto principal */
+  --color-text-secondary: #7A7A7A; /* Gris medio - Texto secundario */
+
+  /* Tipografías */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-heading: 'Poppins', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Estilos base globales */

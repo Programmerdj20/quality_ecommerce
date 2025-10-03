@@ -1,0 +1,241 @@
+---
+/**
+ * BannerCarousel - Carrusel automático de banners
+ * Muestra las imágenes completas de los banners sin overlay de texto
+ * Los banners rotan automáticamente cada 5 segundos
+ */
+
+import type { Banner } from '@/types';
+
+interface Props {
+  banners: Banner[];
+}
+
+const { banners } = Astro.props;
+
+// Filtrar solo banners activos y ordenar
+const bannersActivos = banners
+  .filter(b => b.activo)
+  .sort((a, b) => a.orden - b.orden);
+
+// Si no hay banners, no renderizar nada
+if (bannersActivos.length === 0) {
+  return null;
+}
+---
+
+<section class="banner-carousel relative w-full overflow-hidden bg-gray-100">
+  <!-- Contenedor de banners -->
+  <div class="banner-container relative w-full">
+    <!-- Aspect ratio container para mantener proporciones -->
+    <div class="aspect-[16/9] sm:aspect-[21/9] md:aspect-[24/9] lg:aspect-[32/9] relative">
+      {bannersActivos.map((banner, index) => (
+        <div
+          class={`banner-slide absolute inset-0 transition-opacity duration-1000 ${
+            index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'
+          }`}
+          data-banner-id={banner.id}
+          data-index={index}
+        >
+          <img
+            src={banner.imagen}
+            alt={`Banner ${index + 1}`}
+            class="w-full h-full object-cover"
+            loading={index === 0 ? 'eager' : 'lazy'}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Indicadores (dots) -->
+  {bannersActivos.length > 1 && (
+    <div class="banner-indicators absolute bottom-4 left-0 right-0 z-20 flex justify-center gap-2">
+      {bannersActivos.map((_, index) => (
+        <button
+          class={`banner-dot w-3 h-3 rounded-full transition-all duration-300 ${
+            index === 0
+              ? 'bg-white w-8'
+              : 'bg-white/50 hover:bg-white/75'
+          }`}
+          data-index={index}
+          aria-label={`Ir al banner ${index + 1}`}
+        />
+      ))}
+    </div>
+  )}
+
+  <!-- Botones de navegación (prev/next) -->
+  {bannersActivos.length > 1 && (
+    <>
+      <button
+        class="banner-nav-btn banner-prev absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all opacity-0 hover:opacity-100 group-hover:opacity-100"
+        aria-label="Banner anterior"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <button
+        class="banner-nav-btn banner-next absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all opacity-0 hover:opacity-100 group-hover:opacity-100"
+        aria-label="Banner siguiente"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </>
+  )}
+</section>
+
+<script>
+  const bannerSlides = document.querySelectorAll('.banner-slide');
+  const bannerDots = document.querySelectorAll('.banner-dot');
+  const prevBtn = document.querySelector('.banner-prev');
+  const nextBtn = document.querySelector('.banner-next');
+  const bannerCarousel = document.querySelector('.banner-carousel');
+
+  let currentIndex = 0;
+  let autoPlayInterval: number | null = null;
+  const totalBanners = bannerSlides.length;
+
+  // Si solo hay un banner, no hacer nada
+  if (totalBanners <= 1) {
+    // Asegurar que el único banner esté visible
+    if (bannerSlides[0]) {
+      (bannerSlides[0] as HTMLElement).style.opacity = '1';
+      (bannerSlides[0] as HTMLElement).style.zIndex = '10';
+    }
+  } else {
+    /**
+     * Cambia al banner en el índice especificado
+     */
+    function goToBanner(index: number) {
+      // Remover clases activas de todos
+      bannerSlides.forEach((slide) => {
+        slide.classList.remove('opacity-100', 'z-10');
+        slide.classList.add('opacity-0', 'z-0');
+      });
+
+      bannerDots.forEach((dot) => {
+        dot.classList.remove('bg-white', 'w-8');
+        dot.classList.add('bg-white/50', 'w-3');
+      });
+
+      // Activar el banner actual
+      bannerSlides[index]?.classList.remove('opacity-0', 'z-0');
+      bannerSlides[index]?.classList.add('opacity-100', 'z-10');
+
+      bannerDots[index]?.classList.remove('bg-white/50', 'w-3');
+      bannerDots[index]?.classList.add('bg-white', 'w-8');
+
+      currentIndex = index;
+    }
+
+    /**
+     * Avanza al siguiente banner
+     */
+    function nextBanner() {
+      const nextIndex = (currentIndex + 1) % totalBanners;
+      goToBanner(nextIndex);
+    }
+
+    /**
+     * Retrocede al banner anterior
+     */
+    function prevBanner() {
+      const prevIndex = (currentIndex - 1 + totalBanners) % totalBanners;
+      goToBanner(prevIndex);
+    }
+
+    /**
+     * Inicia el auto-play
+     */
+    function startAutoPlay() {
+      if (autoPlayInterval) return;
+      autoPlayInterval = window.setInterval(nextBanner, 5000);
+    }
+
+    /**
+     * Detiene el auto-play
+     */
+    function stopAutoPlay() {
+      if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+      }
+    }
+
+    // Event listeners para los dots
+    bannerDots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        goToBanner(index);
+        stopAutoPlay();
+        startAutoPlay(); // Reiniciar auto-play
+      });
+    });
+
+    // Event listeners para botones de navegación
+    prevBtn?.addEventListener('click', () => {
+      prevBanner();
+      stopAutoPlay();
+      startAutoPlay();
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      nextBanner();
+      stopAutoPlay();
+      startAutoPlay();
+    });
+
+    // Pausar auto-play al hacer hover
+    bannerCarousel?.addEventListener('mouseenter', stopAutoPlay);
+    bannerCarousel?.addEventListener('mouseleave', startAutoPlay);
+
+    // Iniciar auto-play
+    startAutoPlay();
+
+    // Limpiar al desmontar (si es necesario)
+    window.addEventListener('beforeunload', stopAutoPlay);
+  }
+</script>
+
+<style>
+  .banner-carousel {
+    /* Hacer que los botones de navegación sean visibles al hover */
+    position: relative;
+  }
+
+  .banner-carousel:hover .banner-nav-btn {
+    opacity: 1;
+  }
+
+  /* Asegurar que las transiciones sean suaves */
+  .banner-slide {
+    transition: opacity 1s ease-in-out, z-index 0s linear 1s;
+  }
+
+  .banner-slide.opacity-100 {
+    transition: opacity 1s ease-in-out, z-index 0s linear 0s;
+  }
+
+  /* Animación suave para los indicadores */
+  .banner-dot {
+    transition: all 0.3s ease;
+  }
+
+  /* Responsive: ajustar tamaño de botones en mobile */
+  @media (max-width: 640px) {
+    .banner-nav-btn {
+      width: 2.5rem;
+      height: 2.5rem;
+      opacity: 0.7;
+    }
+
+    .banner-nav-btn svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+</style>

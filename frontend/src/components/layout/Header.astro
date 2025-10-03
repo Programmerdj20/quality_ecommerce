@@ -1,86 +1,24 @@
 ---
 /**
- * Header - Cabecera del sitio con navegación
+ * Header - Navbar Minimalista con diseño premium
+ * Layout: [Logo] --- [Búsqueda Centro] --- [Ingresar/Registrarse | Carrito]
  */
-
-import Navigation from './Navigation.astro';
 ---
 
-<header class="sticky top-0 z-50 bg-background border-b border-gray-200 shadow-sm">
+<header class="sticky top-0 z-50 bg-white border-b border-gray-300 shadow-sm">
   <div class="container mx-auto px-4">
-    <div class="flex items-center justify-between h-16">
-      <!-- Logo -->
-      <a href="/" class="flex items-center gap-2 group">
-        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl group-hover:bg-secondary transition-colors">
-          QE
-        </div>
-        <span class="font-heading font-bold text-xl text-text hidden sm:block">
-          Quality <span class="text-primary">Ecommerce</span>
-        </span>
-      </a>
-
-      <!-- Navegación Desktop -->
-      <Navigation />
-
-      <!-- Carrito y Acciones -->
-      <div class="flex items-center gap-4">
-        <!-- Botón Carrito -->
+    <div class="flex items-center justify-between gap-4 h-16 lg:h-18">
+      <!-- Left Section: Hamburger (mobile) + Logo -->
+      <div class="flex items-center gap-4 flex-shrink-0">
+        <!-- Botón Hamburguesa (solo mobile/tablet) -->
         <button
-          id="cart-trigger"
-          class="relative p-2 hover:bg-gray-100 rounded-full transition-colors group"
-          aria-label="Abrir carrito de compras"
-        >
-          <svg
-            class="w-6 h-6 text-text group-hover:text-primary transition-colors"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-            ></path>
-          </svg>
-          <!-- Badge contador (se actualizará con JavaScript) -->
-          <span
-            id="cart-count"
-            class="absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full min-w-5 h-5 px-1 flex items-center justify-center hidden animate-bounce"
-          >
-            0
-          </span>
-        </button>
-
-        <!-- Botón Usuario -->
-        <a
-          href="/cuenta/login"
-          class="p-2 hover:bg-gray-100 rounded-full transition-colors group"
-          aria-label="Mi cuenta"
-        >
-          <svg
-            class="w-6 h-6 text-text group-hover:text-primary transition-colors"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            ></path>
-          </svg>
-        </a>
-
-        <!-- Menú Mobile Toggle -->
-        <button
-          id="mobile-menu-toggle"
-          class="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          id="mobile-menu-trigger"
+          class="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
           aria-label="Abrir menú"
         >
           <svg
-            class="w-6 h-6 text-text"
+            id="hamburger-icon"
+            class="w-6 h-6 text-gray-800 transition-transform duration-300"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -93,80 +31,171 @@ import Navigation from './Navigation.astro';
             ></path>
           </svg>
         </button>
+
+        <!-- Logo (flexible: cuadrado o horizontal) -->
+        <a href="/" class="flex items-center group">
+          <!-- Logo Cuadrado (ejemplo con iniciales) -->
+          <div class="w-10 h-10 bg-black rounded-lg flex items-center justify-center text-white font-bold text-lg group-hover:bg-gray-800 transition-colors">
+            QE
+          </div>
+
+          <!-- Nombre del sitio (opcional, oculto en mobile) -->
+          <span class="ml-3 font-heading font-semibold text-lg text-gray-800 hidden md:block">
+            Quality <span class="text-black font-bold">Ecommerce</span>
+          </span>
+
+          <!-- Alternativa: Logo horizontal
+          <img
+            src="/logo-horizontal.svg"
+            alt="Quality Ecommerce"
+            class="h-10 w-auto"
+          />
+          -->
+        </a>
+      </div>
+
+      <!-- Center Section: Barra de búsqueda (desktop) -->
+      <div class="hidden lg:flex flex-1 max-w-xl mx-8">
+        <button
+          id="search-trigger-desktop"
+          class="w-full flex items-center gap-3 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+          aria-label="Buscar productos"
+        >
+          <svg
+            class="w-5 h-5 text-gray-500 flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            ></path>
+          </svg>
+          <span class="text-sm text-gray-500 font-medium">Buscar productos...</span>
+        </button>
+      </div>
+
+      <!-- Right Section: Búsqueda (mobile) | Login | Carrito -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <!-- Botón Búsqueda (solo mobile) -->
+        <button
+          id="search-trigger-mobile"
+          class="lg:hidden p-2.5 hover:bg-gray-100 rounded-full transition-colors group"
+          aria-label="Buscar productos"
+        >
+          <svg
+            class="w-5 h-5 text-gray-800 group-hover:text-black transition-colors"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            ></path>
+          </svg>
+        </button>
+
+        <!-- Botón Login / Registrarse -->
+        <a
+          href="/cuenta/login"
+          class="hidden sm:flex px-3 py-2 text-sm font-medium text-gray-800 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
+          aria-label="Ingresar o registrarse"
+        >
+          Ingresar/Registrarse
+        </a>
+
+        <!-- Botón Carrito con Badge -->
+        <button
+          id="cart-trigger"
+          class="relative p-2.5 hover:bg-gray-100 rounded-full transition-colors group"
+          aria-label="Abrir carrito de compras"
+        >
+          <svg
+            class="w-5 h-5 text-gray-800 group-hover:text-black transition-colors"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+            ></path>
+          </svg>
+
+          <!-- Badge Contador -->
+          <span
+            id="cart-count"
+            class="absolute -top-0.5 -right-0.5 bg-black text-white text-xs font-bold rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center hidden"
+          >
+            0
+          </span>
+        </button>
       </div>
     </div>
-  </div>
-
-  <!-- Menú Mobile (oculto por defecto) -->
-  <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 bg-background">
-    <nav class="container mx-auto px-4 py-4">
-      <ul class="space-y-2">
-        <li>
-          <a
-            href="/"
-            class="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-text"
-          >
-            Inicio
-          </a>
-        </li>
-        <li>
-          <a
-            href="/productos"
-            class="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-text"
-          >
-            Productos
-          </a>
-        </li>
-        <li>
-          <a
-            href="/productos/tecnologia"
-            class="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-text-secondary"
-          >
-            Tecnología
-          </a>
-        </li>
-        <li>
-          <a
-            href="/productos/hogar"
-            class="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-text-secondary"
-          >
-            Hogar
-          </a>
-        </li>
-        <li>
-          <a
-            href="/productos/moda"
-            class="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-text-secondary"
-          >
-            Moda
-          </a>
-        </li>
-      </ul>
-    </nav>
   </div>
 </header>
 
 <script>
   import { cartStore } from '@/stores/cartStore';
 
-  // Toggle menú mobile
-  const toggle = document.getElementById('mobile-menu-toggle');
-  const menu = document.getElementById('mobile-menu');
+  // ============================================
+  // Mobile Menu Trigger
+  // ============================================
+  const mobileMenuTrigger = document.getElementById('mobile-menu-trigger');
+  const hamburgerIcon = document.getElementById('hamburger-icon');
 
-  toggle?.addEventListener('click', () => {
-    menu?.classList.toggle('hidden');
+  mobileMenuTrigger?.addEventListener('click', () => {
+    // Toggle mobile menu (se implementará en MobileMenu.astro)
+    if (typeof (window as any).toggleMobileMenu === 'function') {
+      (window as any).toggleMobileMenu();
+
+      // Animar icono hamburguesa → X
+      hamburgerIcon?.classList.toggle('rotate-90');
+    }
   });
 
-  // Cart trigger - abrir drawer
+  // ============================================
+  // Search Trigger (Desktop y Mobile)
+  // ============================================
+  const searchTriggerDesktop = document.getElementById('search-trigger-desktop');
+  const searchTriggerMobile = document.getElementById('search-trigger-mobile');
+
+  searchTriggerDesktop?.addEventListener('click', () => {
+    if (typeof (window as any).openSearchModal === 'function') {
+      (window as any).openSearchModal();
+    }
+  });
+
+  searchTriggerMobile?.addEventListener('click', () => {
+    if (typeof (window as any).openSearchModal === 'function') {
+      (window as any).openSearchModal();
+    }
+  });
+
+  // ============================================
+  // Cart Trigger
+  // ============================================
   const cartTrigger = document.getElementById('cart-trigger');
+
   cartTrigger?.addEventListener('click', () => {
     if (typeof (window as any).openCart === 'function') {
       (window as any).openCart();
     }
   });
 
-  // Actualizar badge del carrito
+  // ============================================
+  // Cart Badge Update
+  // ============================================
   const cartBadge = document.getElementById('cart-count');
+
   cartStore.subscribe((cart) => {
     if (cartBadge) {
       cartBadge.textContent = cart.itemCount.toString();

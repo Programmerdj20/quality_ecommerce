@@ -1,0 +1,169 @@
+---
+/**
+ * CategorySidebar - Sidebar sticky con categorías para filtrado de productos
+ * Responsive: Desktop = sidebar fijo | Mobile = dropdown horizontal
+ */
+
+import type { ProductCategory } from '@/types';
+
+interface Props {
+  categories: ProductCategory[];
+}
+
+const { categories } = Astro.props;
+---
+
+<!-- Sidebar Desktop: Sticky a la izquierda -->
+<aside class="hidden lg:block lg:sticky lg:top-24 lg:self-start">
+  <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-gray-900 to-black text-white px-6 py-4">
+      <h2 class="font-heading font-bold text-lg">Categorías</h2>
+    </div>
+
+    <!-- Lista de Categorías -->
+    <nav class="p-4">
+      <ul class="space-y-2">
+        <!-- Opción "Todos los productos" -->
+        <li>
+          <button
+            data-category="all"
+            class="category-filter-btn w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 bg-black text-white"
+          >
+            <div class="flex items-center justify-between">
+              <span>Todos los productos</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </div>
+          </button>
+        </li>
+
+        <!-- Categorías dinámicas -->
+        {categories.map((category) => (
+          <li>
+            <button
+              data-category={category.slug}
+              class="category-filter-btn w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 hover:bg-gray-50 text-gray-700 hover:text-black border border-transparent hover:border-gray-200"
+            >
+              <div class="flex items-center justify-between">
+                <span class="capitalize">{category.nombre}</span>
+                <span class="text-xs text-gray-400 font-normal">
+                  {category.productCount}
+                </span>
+              </div>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</aside>
+
+<!-- Mobile: Dropdown horizontal arriba de productos -->
+<div class="lg:hidden mb-6">
+  <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+    <button
+      id="mobile-category-toggle"
+      class="w-full flex items-center justify-between text-left font-semibold text-gray-800"
+    >
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <span id="mobile-category-label">Todos los productos</span>
+      </div>
+      <svg id="mobile-category-chevron" class="w-5 h-5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div id="mobile-category-menu" class="hidden mt-4 space-y-2 border-t border-gray-200 pt-4">
+      <!-- Opción "Todos" -->
+      <button
+        data-category="all"
+        class="category-filter-btn-mobile w-full text-left px-4 py-2.5 rounded-lg font-medium transition-all bg-black text-white"
+      >
+        Todos los productos
+      </button>
+
+      <!-- Categorías -->
+      {categories.map((category) => (
+        <button
+          data-category={category.slug}
+          class="category-filter-btn-mobile w-full text-left px-4 py-2.5 rounded-lg font-medium transition-all hover:bg-gray-50 text-gray-700 hover:text-black border border-transparent hover:border-gray-200"
+        >
+          <div class="flex items-center justify-between">
+            <span class="capitalize">{category.nombre}</span>
+            <span class="text-xs text-gray-400">
+              {category.productCount}
+            </span>
+          </div>
+        </button>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  // Toggle del menú mobile
+  const toggleBtn = document.getElementById('mobile-category-toggle');
+  const menu = document.getElementById('mobile-category-menu');
+  const chevron = document.getElementById('mobile-category-chevron');
+
+  toggleBtn?.addEventListener('click', () => {
+    menu?.classList.toggle('hidden');
+    chevron?.classList.toggle('rotate-180');
+  });
+
+  // Manejo de filtros (Desktop)
+  document.querySelectorAll('.category-filter-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLButtonElement;
+      const category = target.dataset.category || 'all';
+
+      // Actualizar estados visuales
+      document.querySelectorAll('.category-filter-btn').forEach((b) => {
+        b.classList.remove('bg-black', 'text-white');
+        b.classList.add('hover:bg-gray-50', 'text-gray-700', 'hover:text-black', 'border-transparent', 'hover:border-gray-200');
+      });
+
+      target.classList.add('bg-black', 'text-white');
+      target.classList.remove('hover:bg-gray-50', 'text-gray-700', 'hover:text-black', 'border-transparent', 'hover:border-gray-200');
+
+      // Disparar evento personalizado para filtrar productos
+      window.dispatchEvent(new CustomEvent('categoryChange', { detail: { category } }));
+    });
+  });
+
+  // Manejo de filtros (Mobile)
+  document.querySelectorAll('.category-filter-btn-mobile').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLButtonElement;
+      const category = target.dataset.category || 'all';
+      const label = document.getElementById('mobile-category-label');
+
+      // Actualizar label
+      if (label) {
+        label.textContent = target.textContent?.trim() || 'Todos los productos';
+      }
+
+      // Actualizar estados visuales
+      document.querySelectorAll('.category-filter-btn-mobile').forEach((b) => {
+        b.classList.remove('bg-black', 'text-white');
+        b.classList.add('hover:bg-gray-50', 'text-gray-700', 'hover:text-black', 'border-transparent', 'hover:border-gray-200');
+      });
+
+      target.classList.add('bg-black', 'text-white');
+      target.classList.remove('hover:bg-gray-50', 'text-gray-700', 'hover:text-black', 'border-transparent', 'hover:border-gray-200');
+
+      // Cerrar menú
+      menu?.classList.add('hidden');
+      chevron?.classList.remove('rotate-180');
+
+      // Disparar evento personalizado para filtrar productos
+      window.dispatchEvent(new CustomEvent('categoryChange', { detail: { category } }));
+    });
+  });
+</script>

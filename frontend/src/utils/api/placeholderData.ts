@@ -179,6 +179,360 @@ export const PLACEHOLDER_PRODUCTS: Product[] = [
     slug: 'cafetera-espresso-automatica-pro',
     activo: true,
     fechaCreacion: '2025-01-11T13:20:00Z'
+  },
+  {
+    id: '7',
+    sku: 'TECH-MON-007',
+    nombre: 'Monitor Gaming Curvo 27" 240Hz',
+    descripcion: 'Monitor gaming de alta gama con pantalla curva VA de 27 pulgadas, tasa de refresco de 240Hz, tiempo de respuesta de 1ms, resolución QHD 2560x1440, compatible con FreeSync y G-Sync.',
+    precio: 1799000,
+    precioDescuento: 1499000,
+    stock: 18,
+    categoria: 'tecnologia',
+    subcategoria: 'monitores',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/1f2937/white?text=Monitor+Gaming+27',
+      galeria: [
+        'https://placehold.co/800x800/1f2937/white?text=Vista+Frontal',
+        'https://placehold.co/800x800/1f2937/white?text=Base+RGB',
+      ]
+    },
+    caracteristicas: {
+      'Tamaño': '27 pulgadas',
+      'Resolución': '2560x1440 QHD',
+      'Tasa Refresco': '240Hz',
+      'Tiempo Respuesta': '1ms MPRT',
+      'Panel': 'VA Curvo 1500R',
+      'Conectividad': 'HDMI 2.1, DisplayPort 1.4',
+      'HDR': 'HDR10'
+    },
+    slug: 'monitor-gaming-curvo-27-240hz',
+    activo: true,
+    fechaCreacion: '2025-01-16T08:30:00Z'
+  },
+  {
+    id: '8',
+    sku: 'TECH-MOU-008',
+    nombre: 'Mouse Gamer RGB Pro 16000 DPI',
+    descripcion: 'Mouse gaming de alta precisión con sensor óptico de 16000 DPI, 8 botones programables, iluminación RGB personalizable, switches mecánicos de 50 millones de clics.',
+    precio: 189000,
+    stock: 65,
+    categoria: 'tecnologia',
+    subcategoria: 'accesorios',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/374151/white?text=Mouse+Gamer',
+      galeria: [
+        'https://placehold.co/800x800/374151/white?text=RGB+Lights',
+        'https://placehold.co/800x800/374151/white?text=Botones',
+      ]
+    },
+    caracteristicas: {
+      'Sensor': 'Óptico 16000 DPI',
+      'Botones': '8 programables',
+      'Iluminación': 'RGB 16.8M colores',
+      'Switches': 'Mecánicos 50M clics',
+      'Cable': 'Trenzado 1.8m',
+      'Software': 'Compatible Windows/Mac'
+    },
+    slug: 'mouse-gamer-rgb-pro-16000-dpi',
+    activo: true,
+    fechaCreacion: '2025-01-17T10:15:00Z'
+  },
+  {
+    id: '9',
+    sku: 'TECH-KEY-009',
+    nombre: 'Teclado Mecánico RGB Switch Blue',
+    descripcion: 'Teclado mecánico gaming con switches blue táctiles y audibles, iluminación RGB por tecla, construcción en aluminio, reposamuñecas magnético, teclas anti-ghosting completas.',
+    precio: 459000,
+    precioDescuento: 379000,
+    stock: 34,
+    categoria: 'tecnologia',
+    subcategoria: 'accesorios',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/1a1a1a/white?text=Teclado+Mecánico',
+      galeria: [
+        'https://placehold.co/800x800/1a1a1a/white?text=RGB+Backlight',
+        'https://placehold.co/800x800/1a1a1a/white?text=Switches',
+      ]
+    },
+    caracteristicas: {
+      'Switches': 'Mecánicos Blue',
+      'Iluminación': 'RGB por tecla',
+      'Material': 'Aluminio anodizado',
+      'Anti-Ghosting': 'N-Key Rollover',
+      'Cable': 'USB-C desmontable',
+      'Incluye': 'Reposamuñecas magnético'
+    },
+    slug: 'teclado-mecanico-rgb-switch-blue',
+    activo: true,
+    fechaCreacion: '2025-01-18T14:00:00Z'
+  },
+  {
+    id: '10',
+    sku: 'TECH-CAM-010',
+    nombre: 'Webcam 4K Streaming con Micrófono',
+    descripcion: 'Webcam profesional 4K Ultra HD con enfoque automático, corrección de luz, doble micrófono con cancelación de ruido, compatible con Zoom, Teams, OBS. Perfecta para streaming y videoconferencias.',
+    precio: 549000,
+    stock: 27,
+    categoria: 'tecnologia',
+    subcategoria: 'accesorios',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/4a5568/white?text=Webcam+4K',
+      galeria: [
+        'https://placehold.co/800x800/4a5568/white?text=Vista+Frontal',
+        'https://placehold.co/800x800/4a5568/white?text=Con+Trípode',
+      ]
+    },
+    caracteristicas: {
+      'Resolución': '4K 30fps / 1080p 60fps',
+      'Campo Visión': '90 grados',
+      'Enfoque': 'Automático',
+      'Micrófono': 'Dual con cancelación ruido',
+      'Conexión': 'USB 3.0',
+      'Incluye': 'Trípode y tapa privacidad'
+    },
+    slug: 'webcam-4k-streaming-microfono',
+    activo: true,
+    fechaCreacion: '2025-01-19T09:45:00Z'
+  },
+  {
+    id: '11',
+    sku: 'HOME-ASP-011',
+    nombre: 'Aspiradora Robot Inteligente WiFi',
+    descripcion: 'Robot aspirador con navegación láser, mapeo inteligente, succión de 2700Pa, control por app, compatible con Alexa y Google Home, limpieza programada y automática.',
+    precio: 1399000,
+    precioDescuento: 1099000,
+    stock: 14,
+    categoria: 'hogar',
+    subcategoria: 'electrodomesticos',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/1f2937/white?text=Robot+Aspiradora',
+      galeria: [
+        'https://placehold.co/800x800/1f2937/white?text=Vista+Superior',
+        'https://placehold.co/800x800/1f2937/white?text=Base+Carga',
+      ]
+    },
+    caracteristicas: {
+      'Succión': '2700Pa',
+      'Navegación': 'Láser LDS',
+      'Batería': '5200mAh - 150min',
+      'Depósito': '600ml',
+      'Conectividad': 'WiFi, App móvil',
+      'Compatible': 'Alexa, Google Home',
+      'Incluye': 'Base carga, 4 filtros'
+    },
+    slug: 'aspiradora-robot-inteligente-wifi',
+    activo: true,
+    fechaCreacion: '2025-01-20T11:30:00Z'
+  },
+  {
+    id: '12',
+    sku: 'HOME-LED-012',
+    nombre: 'Kit 3 Lámparas LED Inteligentes RGB',
+    descripcion: 'Pack de 3 bombillas LED inteligentes con 16 millones de colores, control por voz y app, programación horaria, sincronización con música, bajo consumo de energía.',
+    precio: 229000,
+    precioDescuento: 179000,
+    stock: 58,
+    categoria: 'hogar',
+    subcategoria: 'iluminacion',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/374151/white?text=LED+Smart+Kit',
+      galeria: [
+        'https://placehold.co/800x800/374151/white?text=Colores+RGB',
+        'https://placehold.co/800x800/374151/white?text=App+Control',
+      ]
+    },
+    caracteristicas: {
+      'Cantidad': '3 bombillas',
+      'Potencia': '9W equivalente 60W',
+      'Colores': '16 millones RGB',
+      'Conectividad': 'WiFi 2.4GHz',
+      'Control': 'App + Voz',
+      'Compatible': 'Alexa, Google, Siri',
+      'Vida Útil': '25.000 horas'
+    },
+    slug: 'kit-3-lamparas-led-inteligentes-rgb',
+    activo: true,
+    fechaCreacion: '2025-01-21T15:20:00Z'
+  },
+  {
+    id: '13',
+    sku: 'HOME-LIC-013',
+    nombre: 'Licuadora Industrial 2000W 2.5L',
+    descripcion: 'Licuadora de alta potencia con motor de 2000W, jarra de vidrio templado de 2.5 litros, 8 velocidades + pulse, cuchillas de acero inoxidable, base antideslizante.',
+    precio: 489000,
+    stock: 23,
+    categoria: 'hogar',
+    subcategoria: 'electrodomesticos',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/4a5568/white?text=Licuadora+Industrial',
+      galeria: [
+        'https://placehold.co/800x800/4a5568/white?text=Vista+Lateral',
+        'https://placehold.co/800x800/4a5568/white?text=Panel+Control',
+      ]
+    },
+    caracteristicas: {
+      'Potencia': '2000W',
+      'Capacidad': '2.5 litros',
+      'Velocidades': '8 + Pulse',
+      'Jarra': 'Vidrio templado',
+      'Cuchillas': 'Acero inoxidable 6 puntas',
+      'Funciones': 'Hielo, smoothies, sopas',
+      'Garantía': '3 años'
+    },
+    slug: 'licuadora-industrial-2000w-2-5l',
+    activo: true,
+    fechaCreacion: '2025-01-22T12:00:00Z'
+  },
+  {
+    id: '14',
+    sku: 'HOME-SAR-014',
+    nombre: 'Set 5 Sartenes Antiadherentes Profesional',
+    descripcion: 'Juego completo de sartenes de aluminio forjado con recubrimiento cerámico antiadherente libre de PFOA, aptas para todo tipo de cocinas incluida inducción, mangos ergonómicos.',
+    precio: 359000,
+    stock: 31,
+    categoria: 'hogar',
+    subcategoria: 'cocina',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/1a1a1a/white?text=Set+Sartenes',
+      galeria: [
+        'https://placehold.co/800x800/1a1a1a/white?text=5+Piezas',
+        'https://placehold.co/800x800/1a1a1a/white?text=Recubrimiento',
+      ]
+    },
+    caracteristicas: {
+      'Piezas': '5 sartenes (18/20/24/28/30cm)',
+      'Material': 'Aluminio forjado',
+      'Recubrimiento': 'Cerámico antiadherente',
+      'Libre de': 'PFOA, PFOS, plomo',
+      'Compatible': 'Todo tipo cocinas + inducción',
+      'Mangos': 'Baquelita termorresistente',
+      'Garantía': '2 años'
+    },
+    slug: 'set-5-sartenes-antiadherentes-profesional',
+    activo: true,
+    fechaCreacion: '2025-01-23T10:30:00Z'
+  },
+  {
+    id: '15',
+    sku: 'FASH-JAC-015',
+    nombre: 'Chaqueta Impermeable Deportiva Unisex',
+    descripcion: 'Chaqueta deportiva de alta calidad con tejido impermeable y transpirable, capucha ajustable, bolsillos con cierre, reflectivos de seguridad, perfecta para running y outdoor.',
+    precio: 299000,
+    precioDescuento: 229000,
+    stock: 52,
+    categoria: 'moda',
+    subcategoria: 'deportivo',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/1f2937/white?text=Chaqueta+Deportiva',
+      galeria: [
+        'https://placehold.co/800x800/1f2937/white?text=Vista+Trasera',
+        'https://placehold.co/800x800/1f2937/white?text=Detalles',
+      ]
+    },
+    caracteristicas: {
+      'Material': 'Poliéster impermeable',
+      'Transpirable': 'Sí, membrana técnica',
+      'Capucha': 'Ajustable con cordón',
+      'Bolsillos': '3 con cierre',
+      'Reflectivos': 'Frontales y traseros',
+      'Tallas': 'XS, S, M, L, XL, XXL',
+      'Colores': 'Negro, Azul, Verde'
+    },
+    slug: 'chaqueta-impermeable-deportiva-unisex',
+    activo: true,
+    fechaCreacion: '2025-01-24T14:45:00Z'
+  },
+  {
+    id: '16',
+    sku: 'FASH-WAT-016',
+    nombre: 'Reloj Inteligente Deportivo GPS',
+    descripcion: 'Smartwatch deportivo con GPS integrado, monitor de frecuencia cardíaca 24/7, oxígeno en sangre, 100+ modos deportivos, resistente al agua 5ATM, batería 14 días.',
+    precio: 699000,
+    precioDescuento: 549000,
+    stock: 41,
+    categoria: 'moda',
+    subcategoria: 'accesorios',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/374151/white?text=Smartwatch+GPS',
+      galeria: [
+        'https://placehold.co/800x800/374151/white?text=Pantalla+AMOLED',
+        'https://placehold.co/800x800/374151/white?text=Correas',
+      ]
+    },
+    caracteristicas: {
+      'Pantalla': '1.43" AMOLED',
+      'GPS': 'Integrado + GLONASS',
+      'Sensores': 'FC, SpO2, sueño, estrés',
+      'Deportes': '100+ modos',
+      'Batería': '14 días uso normal',
+      'Resistencia': '5ATM (50m)',
+      'Conectividad': 'Bluetooth 5.0',
+      'Compatible': 'iOS y Android'
+    },
+    slug: 'reloj-inteligente-deportivo-gps',
+    activo: true,
+    fechaCreacion: '2025-01-25T09:00:00Z'
+  },
+  {
+    id: '17',
+    sku: 'FASH-BAG-017',
+    nombre: 'Mochila Antirrobo USB Impermeable',
+    descripcion: 'Mochila urbana de diseño moderno con puerto USB externo, compartimento para laptop 15.6", material impermeable, cierres ocultos antirrobo, correas ergonómicas acolchadas.',
+    precio: 169000,
+    stock: 67,
+    categoria: 'moda',
+    subcategoria: 'accesorios',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/4a5568/white?text=Mochila+Antirrobo',
+      galeria: [
+        'https://placehold.co/800x800/4a5568/white?text=Puerto+USB',
+        'https://placehold.co/800x800/4a5568/white?text=Compartimentos',
+      ]
+    },
+    caracteristicas: {
+      'Capacidad': '25 litros',
+      'Laptop': 'Hasta 15.6 pulgadas',
+      'Puerto USB': 'Carga externa',
+      'Material': 'Poliéster impermeable',
+      'Cierres': 'Ocultos antirrobo',
+      'Bolsillos': '8 compartimentos',
+      'Correas': 'Ergonómicas acolchadas',
+      'Colores': 'Negro, Gris'
+    },
+    slug: 'mochila-antirrobo-usb-impermeable',
+    activo: true,
+    fechaCreacion: '2025-01-26T11:15:00Z'
+  },
+  {
+    id: '18',
+    sku: 'FASH-SUN-018',
+    nombre: 'Gafas de Sol Polarizadas UV400',
+    descripcion: 'Gafas de sol deportivas con lentes polarizadas, protección UV400, montura de aluminio-magnesio ultraligera, diseño aerodinámico, incluye estuche rígido y paño de limpieza.',
+    precio: 149000,
+    precioDescuento: 99000,
+    stock: 78,
+    categoria: 'moda',
+    subcategoria: 'accesorios',
+    imagenes: {
+      principal: 'https://placehold.co/800x800/1a1a1a/white?text=Gafas+Sol',
+      galeria: [
+        'https://placehold.co/800x800/1a1a1a/white?text=Vista+Lateral',
+        'https://placehold.co/800x800/1a1a1a/white?text=Estuche',
+      ]
+    },
+    caracteristicas: {
+      'Lentes': 'Polarizadas TAC',
+      'Protección': 'UV400 100%',
+      'Montura': 'Aluminio-magnesio',
+      'Peso': '26 gramos',
+      'Categoría': 'CAT 3',
+      'Incluye': 'Estuche rígido, paño, caja',
+      'Colores': 'Negro, Plata, Azul'
+    },
+    slug: 'gafas-sol-polarizadas-uv400',
+    activo: true,
+    fechaCreacion: '2025-01-27T13:30:00Z'
   }
 ];
 

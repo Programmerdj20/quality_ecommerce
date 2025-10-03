@@ -7,6 +7,8 @@
 import ThemeProvider from '@/components/theme/ThemeProvider.astro';
 import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
+import MobileMenu from '@/components/layout/MobileMenu.astro';
+import SearchModal from '@/components/search/SearchModal.astro';
 import CartDrawer from '@/components/cart/CartDrawer.astro';
 import ToastContainer from '@/components/toast/ToastContainer.astro';
 import '@/styles/global.css';
@@ -61,6 +63,12 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 
     <!-- Footer -->
     {showFooter && <Footer />}
+
+    <!-- Mobile Menu Drawer (global) -->
+    <MobileMenu />
+
+    <!-- Search Modal (global) -->
+    <SearchModal />
 
     <!-- Cart Drawer (global) -->
     <CartDrawer />

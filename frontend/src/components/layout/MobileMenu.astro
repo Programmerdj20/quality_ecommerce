@@ -1,0 +1,164 @@
+---
+/**
+ * MobileMenu - Drawer lateral para menú mobile
+ * Slide desde la izquierda con overlay oscuro
+ */
+
+const navItems = [
+  { href: '/', label: 'Inicio' },
+  { href: '/productos', label: 'Productos' },
+  { href: '/productos/tecnologia', label: 'Tecnología' },
+  { href: '/productos/hogar', label: 'Hogar' },
+  { href: '/productos/moda', label: 'Moda' },
+  { href: '/productos/deportes', label: 'Deportes' },
+];
+---
+
+<!-- Overlay oscuro -->
+<div
+  id="mobile-menu-overlay"
+  class="fixed inset-0 bg-black/70 z-[60] opacity-0 pointer-events-none transition-opacity duration-300"
+  aria-hidden="true"
+></div>
+
+<!-- Drawer lateral -->
+<aside
+  id="mobile-menu-drawer"
+  class="fixed top-0 left-0 h-full w-[85vw] max-w-[320px] bg-white shadow-2xl z-[70] transform -translate-x-full transition-transform duration-300 ease-out flex flex-col"
+  aria-label="Menú de navegación mobile"
+>
+  <!-- Header del drawer -->
+  <div class="flex items-center justify-between p-4 border-b border-gray-300">
+    <h2 class="font-heading font-bold text-lg text-gray-800">Menú</h2>
+
+    <button
+      id="mobile-menu-close"
+      class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+      aria-label="Cerrar menú"
+    >
+      <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Links de navegación -->
+  <nav class="flex-1 overflow-y-auto py-4">
+    <ul class="space-y-1 px-4">
+      {navItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class="mobile-menu-link block px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 hover:text-black rounded-lg transition-all duration-200"
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  <!-- Footer del drawer (opcional) -->
+  <div class="p-4 border-t border-gray-300">
+    <a
+      href="/cuenta/login"
+      class="block w-full px-4 py-3 text-center text-sm font-semibold bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+    >
+      Iniciar Sesión
+    </a>
+  </div>
+</aside>
+
+<script>
+  const drawer = document.getElementById('mobile-menu-drawer');
+  const overlay = document.getElementById('mobile-menu-overlay');
+  const closeBtn = document.getElementById('mobile-menu-close');
+  const menuLinks = document.querySelectorAll('.mobile-menu-link');
+
+  let isOpen = false;
+
+  /**
+   * Abre el drawer mobile
+   */
+  function openMobileMenu() {
+    isOpen = true;
+    document.body.style.overflow = 'hidden'; // Bloquear scroll del body
+
+    // Mostrar overlay
+    overlay?.classList.remove('pointer-events-none', 'opacity-0');
+    overlay?.classList.add('opacity-100');
+
+    // Slide drawer desde la izquierda
+    drawer?.classList.remove('-translate-x-full');
+    drawer?.classList.add('translate-x-0');
+  }
+
+  /**
+   * Cierra el drawer mobile
+   */
+  function closeMobileMenu() {
+    isOpen = false;
+    document.body.style.overflow = ''; // Restaurar scroll
+
+    // Ocultar overlay
+    overlay?.classList.add('pointer-events-none', 'opacity-0');
+    overlay?.classList.remove('opacity-100');
+
+    // Slide drawer fuera de la pantalla
+    drawer?.classList.add('-translate-x-full');
+    drawer?.classList.remove('translate-x-0');
+  }
+
+  /**
+   * Toggle (abrir/cerrar)
+   */
+  function toggleMobileMenu() {
+    if (isOpen) {
+      closeMobileMenu();
+    } else {
+      openMobileMenu();
+    }
+  }
+
+  // Exponer función globalmente para que Header pueda llamarla
+  (window as any).toggleMobileMenu = toggleMobileMenu;
+  (window as any).openMobileMenu = openMobileMenu;
+  (window as any).closeMobileMenu = closeMobileMenu;
+
+  // Cerrar al hacer click en el overlay
+  overlay?.addEventListener('click', closeMobileMenu);
+
+  // Cerrar con el botón X
+  closeBtn?.addEventListener('click', closeMobileMenu);
+
+  // Cerrar al hacer click en cualquier link
+  menuLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      // Pequeño delay para que se vea la transición antes de navegar
+      setTimeout(closeMobileMenu, 150);
+    });
+  });
+
+  // Cerrar con tecla ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOpen) {
+      closeMobileMenu();
+    }
+  });
+</script>
+
+<style>
+  /* Asegurar que el drawer esté por encima de todo excepto el cart drawer */
+  #mobile-menu-drawer {
+    z-index: 70;
+  }
+
+  #mobile-menu-overlay {
+    z-index: 60;
+  }
+
+  /* Prevenir scroll cuando el menú está abierto */
+  body.mobile-menu-open {
+    overflow: hidden;
+  }
+</style>

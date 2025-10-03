@@ -8,6 +8,13 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { PLACEHOLDER_PRODUCTS } from '@/utils/api/placeholderData';
 import type { Product } from '@/types';
 
+// Generar rutas estáticas para todos los productos
+export async function getStaticPaths() {
+  return PLACEHOLDER_PRODUCTS.map((product) => ({
+    params: { slug: product.slug },
+  }));
+}
+
 // Obtener el slug de la URL
 const { slug } = Astro.params;
 

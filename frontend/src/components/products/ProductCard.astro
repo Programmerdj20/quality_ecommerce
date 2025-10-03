@@ -29,81 +29,103 @@ const formatPrice = (price: number) => {
 const precioFinal = product.precioDescuento || product.precio;
 ---
 
-<article class="group relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
-  <!-- Badge de Descuento -->
+<article class="flex flex-col group relative bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-300 hover:border-black">
+  <!-- Badge de Descuento - Responsive -->
   {descuento > 0 && (
-    <div class="absolute top-3 right-3 z-10 bg-red-600 text-white px-4 py-2 rounded-full text-base font-black shadow-xl border-2 border-white">
+    <div class="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 bg-black text-white px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-lg">
       -{descuento}%
     </div>
   )}
 
-  <!-- Badge de Stock Bajo -->
+  <!-- Badge de Stock Bajo - Responsive -->
   {product.stock > 0 && product.stock <= 5 && (
-    <div class="absolute top-3 left-3 z-10 bg-orange-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold">
-      ¡Solo {product.stock} disponibles!
+    <div class="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 bg-gray-800 text-white px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold">
+      Solo {product.stock}
     </div>
   )}
 
-  <a href={`/productos/${product.slug}`} class="block">
+  <a href={`/productos/${product.slug}`} class="flex flex-col flex-1">
     <!-- Imagen del Producto -->
     <div class="relative aspect-square overflow-hidden bg-gray-50">
       <img
         src={product.imagenes.principal}
         alt={product.nombre}
-        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         loading="lazy"
       />
 
-      <!-- Overlay al hover -->
-      <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
+      <!-- Overlay sutil al hover -->
+      <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-all duration-300"></div>
     </div>
 
-    <!-- Contenido -->
-    <div class="p-5">
-      <!-- Categoría -->
-      <p class="text-xs uppercase tracking-wide text-text-secondary font-medium mb-2">
+    <!-- Contenido - Padding Responsive + Flex Column -->
+    <div class="flex flex-col flex-1 p-3 sm:p-4">
+      <!-- Categoría - Responsive -->
+      <p class="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400 font-normal mb-1.5 sm:mb-2">
         {product.categoria}
       </p>
 
-      <!-- Nombre -->
-      <h3 class="font-heading font-semibold text-base md:text-lg text-text line-clamp-2 mb-3 group-hover:text-primary transition-colors min-h-[3rem]">
+      <!-- Nombre - Responsive -->
+      <h3 class="font-heading font-semibold text-xs sm:text-sm md:text-base text-gray-800 line-clamp-1 truncate mb-2 sm:mb-3 group-hover:text-black transition-colors min-h-[1.25rem] sm:min-h-[1.5rem]" title={product.nombre}>
         {product.nombre}
       </h3>
 
-      <!-- Precio -->
-      <div class="flex flex-wrap items-baseline gap-2 mb-4">
-        <span class="text-2xl md:text-3xl font-black text-green-600">
+      <!-- Precio - Responsive -->
+      <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+        <span class="text-lg sm:text-xl md:text-2xl font-bold text-black">
           {formatPrice(precioFinal)}
         </span>
         {product.precioDescuento && (
-          <span class="text-sm md:text-base text-gray-400 line-through font-medium">
+          <span class="text-xs sm:text-sm text-gray-600 line-through font-medium">
             {formatPrice(product.precio)}
           </span>
         )}
       </div>
 
-      <!-- Footer: Stock y Botón -->
-      <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-        <!-- Indicador de Stock -->
-        <div class="flex items-center gap-1.5">
-          {product.stock > 0 ? (
-            <>
-              <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span class="text-xs text-green-700 font-medium">
-                En stock
-              </span>
-            </>
-          ) : (
-            <>
-              <div class="w-2 h-2 bg-red-500 rounded-full"></div>
-              <span class="text-xs text-red-700 font-medium">
-                Agotado
-              </span>
-            </>
-          )}
-        </div>
+      <!-- Spacer: Empuja el footer hacia abajo -->
+      <div class="flex-1"></div>
 
-        <!-- Botón Agregar -->
+      <!-- Footer: Selector Cantidad y Botón - Responsive (SIEMPRE AL FONDO) -->
+      <div class="flex items-center justify-between gap-2 sm:gap-3 pt-2 sm:pt-3 border-t border-gray-300">
+        <!-- Selector de Cantidad - Responsive (más grande en mobile para touch) -->
+        {product.stock > 0 ? (
+          <div class="flex items-center gap-0.5 sm:gap-1 quantity-selector">
+            <button
+              type="button"
+              class="quantity-btn-decrease w-7 h-7 sm:w-6 sm:h-6 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 transition-colors text-gray-700"
+              data-product-id={product.id}
+              aria-label="Disminuir cantidad"
+            >
+              <svg class="w-3 h-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
+              </svg>
+            </button>
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              class="quantity-input w-10 h-7 sm:w-12 sm:h-6 text-center text-xs font-semibold border border-gray-300 rounded focus:outline-none focus:border-black"
+              value="1"
+              data-min="1"
+              data-max={product.stock}
+              data-product-id={product.id}
+            />
+            <button
+              type="button"
+              class="quantity-btn-increase w-7 h-7 sm:w-6 sm:h-6 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 transition-colors text-gray-700"
+              data-product-id={product.id}
+              aria-label="Aumentar cantidad"
+            >
+              <svg class="w-3 h-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+            </button>
+          </div>
+        ) : (
+          <span class="text-[10px] sm:text-xs text-gray-500 font-medium">Agotado</span>
+        )}
+
+        <!-- Botón Agregar - Responsive -->
         <button
           data-product-id={product.id}
           data-product={JSON.stringify({
@@ -115,23 +137,22 @@ const precioFinal = product.precioDescuento || product.precio;
             stockDisponible: product.stock
           })}
           class={`
-            add-to-cart-btn
-            px-5 py-2.5 rounded-lg font-bold text-sm
+            add-to-cart-btn flex-1
+            px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg font-semibold text-xs
             transition-all duration-200
-            border-2
             ${product.stock > 0
-              ? 'bg-orange-500 border-orange-600 text-white hover:bg-orange-600 hover:shadow-lg hover:scale-105 active:scale-95'
-              : 'bg-gray-200 border-gray-300 text-gray-500 cursor-not-allowed'
+              ? 'bg-black text-white hover:bg-gray-800 active:scale-95'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }
           `}
           disabled={product.stock === 0}
         >
           {product.stock > 0 ? (
-            <span class="flex items-center justify-center gap-1.5">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            <span class="flex items-center justify-center gap-1">
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 5M17 13l1.5 5m-9.5 0a1 1 0 100 2 1 1 0 000-2zm8 0a1 1 0 100 2 1 1 0 000-2z"/>
               </svg>
-              <span>Agregar</span>
+              <span class="hidden lg:inline">Agregar</span>
             </span>
           ) : (
             'Agotado'
@@ -146,54 +167,101 @@ const precioFinal = product.precioDescuento || product.precio;
   import { addToCart } from '@/stores/cartStore';
   import { toastSuccess, toastError } from '@/stores/toastStore';
 
-  // Script del lado del cliente para manejar agregar al carrito
-  document.querySelectorAll('.add-to-cart-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
+  // Delegación de eventos para botones y clicks (funciona con contenido dinámico)
+  document.addEventListener('click', (e) => {
+    // Prevenir navegación al hacer clic en inputs de cantidad
+    const inputClicked = (e.target as HTMLElement).closest('.quantity-input');
+    if (inputClicked) {
+      e.preventDefault();
+      e.stopPropagation();
+      (inputClicked as HTMLInputElement).focus();
+      return;
+    }
+
+    // Botón Decrease (-)
+    const decreaseBtn = (e.target as HTMLElement).closest('.quantity-btn-decrease');
+    if (decreaseBtn) {
       e.preventDefault();
       e.stopPropagation();
 
-      const button = e.currentTarget as HTMLButtonElement;
+      const productId = (decreaseBtn as HTMLElement).dataset.productId;
+      const input = document.querySelector(`.quantity-input[data-product-id="${productId}"]`) as HTMLInputElement;
+
+      if (input) {
+        const min = parseInt(input.dataset.min || '1');
+        let currentValue = parseInt(input.value) || min;
+        if (currentValue > min) {
+          input.value = (currentValue - 1).toString();
+        }
+      }
+      return;
+    }
+
+    // Botón Increase (+)
+    const increaseBtn = (e.target as HTMLElement).closest('.quantity-btn-increase');
+    if (increaseBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const productId = (increaseBtn as HTMLElement).dataset.productId;
+      const input = document.querySelector(`.quantity-input[data-product-id="${productId}"]`) as HTMLInputElement;
+
+      if (input) {
+        const min = parseInt(input.dataset.min || '1');
+        const max = parseInt(input.dataset.max || '99');
+        let currentValue = parseInt(input.value) || min;
+        if (currentValue < max) {
+          input.value = (currentValue + 1).toString();
+        }
+      }
+      return;
+    }
+
+    // Botón Agregar al Carrito
+    const addBtn = (e.target as HTMLElement).closest('.add-to-cart-btn');
+    if (addBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const button = addBtn as HTMLButtonElement;
       const productData = button.dataset.product;
+      const productId = button.dataset.productId;
 
       if (productData) {
         try {
           const product = JSON.parse(productData);
+          const quantityInput = document.querySelector(`.quantity-input[data-product-id="${productId}"]`) as HTMLInputElement;
+          const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
 
-          // Agregar al carrito
-          const success = addToCart(product, 1);
+          const success = addToCart(product, quantity);
 
           if (success) {
-            // Toast de éxito
-            toastSuccess(`${product.nombre} agregado al carrito`);
+            const quantityText = quantity > 1 ? `${quantity}x ` : '';
+            toastSuccess(`${quantityText}${product.nombre} agregado al carrito`);
 
-            // Feedback visual de éxito
             const originalContent = button.innerHTML;
             button.innerHTML = '✓ Agregado';
-            button.classList.add('bg-green-600', 'border-green-700');
-            button.classList.remove('bg-orange-500', 'border-orange-600');
+            button.classList.add('bg-gray-800');
+            button.classList.remove('bg-black');
 
             setTimeout(() => {
               button.innerHTML = originalContent;
-              button.classList.remove('bg-green-600', 'border-green-700');
-              button.classList.add('bg-orange-500', 'border-orange-600');
+              button.classList.remove('bg-gray-800');
+              button.classList.add('bg-black');
+
+              if (quantityInput) {
+                quantityInput.value = '1';
+              }
             }, 1500);
           } else {
-            // Si falla (por ejemplo, sin stock)
             toastError(`No hay stock disponible de ${product.nombre}`);
-
+            const originalContent = button.innerHTML;
             button.textContent = 'Sin stock';
-            button.classList.add('bg-red-600', 'border-red-700');
+            button.classList.add('bg-gray-500');
 
             setTimeout(() => {
-              button.innerHTML = `
-                <span class="flex items-center gap-1.5">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                  </svg>
-                  <span>Agregar</span>
-                </span>
-              `;
-              button.classList.remove('bg-red-600', 'border-red-700');
+              button.innerHTML = originalContent;
+              button.classList.remove('bg-gray-500');
             }, 1500);
           }
         } catch (error) {
@@ -201,6 +269,39 @@ const precioFinal = product.precioDescuento || product.precio;
           toastError('Error al agregar el producto');
         }
       }
-    });
+    }
   });
+
+  // Validación del input manual de cantidad (delegación con input event)
+  document.addEventListener('input', (e) => {
+    const target = e.target as HTMLElement;
+    if (!target.classList.contains('quantity-input')) return;
+
+    const inputElement = target as HTMLInputElement;
+    let value = inputElement.value.replace(/[^0-9]/g, '');
+    const min = parseInt(inputElement.dataset.min || '1');
+    const max = parseInt(inputElement.dataset.max || '99');
+
+    if (value === '') {
+      inputElement.value = '';
+      return;
+    }
+
+    let numValue = parseInt(value);
+    if (numValue < min) numValue = min;
+    if (numValue > max) numValue = max;
+    inputElement.value = numValue.toString();
+  });
+
+  // Validar al perder foco
+  document.addEventListener('blur', (e) => {
+    const target = e.target as HTMLElement;
+    if (!target.classList.contains('quantity-input')) return;
+
+    const inputElement = target as HTMLInputElement;
+    const min = parseInt(inputElement.dataset.min || '1');
+    if (!inputElement.value || parseInt(inputElement.value) < min) {
+      inputElement.value = min.toString();
+    }
+  }, true);
 </script>

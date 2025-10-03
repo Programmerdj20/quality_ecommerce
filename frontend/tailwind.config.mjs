@@ -4,13 +4,23 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Paleta Minimalista (colores estáticos)
+        'white-pure': '#FFFFFF',
+        'white-smoke': '#F5F5F5',
+        'gray-light': '#D9D9D9',
+        'gray-medium': '#7A7A7A',
+        'gray-dark': '#2E2E2E',
+        'black-pure': '#000000',
+
         // Colores dinámicos desde CSS Variables (configurados por el tema activo)
-        primary: 'var(--color-primary, #2563eb)',
-        secondary: 'var(--color-secondary, #7c3aed)',
-        accent: 'var(--color-accent, #f59e0b)',
-        background: 'var(--color-background, #ffffff)',
-        text: 'var(--color-text, #1f2937)',
-        'text-secondary': 'var(--color-text-secondary, #6b7280)',
+        primary: 'var(--color-primary, #000000)',
+        secondary: 'var(--color-secondary, #2E2E2E)',
+        accent: 'var(--color-accent, #000000)',
+        background: 'var(--color-background, #F5F5F5)',
+        surface: 'var(--color-surface, #FFFFFF)',
+        border: 'var(--color-border, #D9D9D9)',
+        text: 'var(--color-text, #2E2E2E)',
+        'text-secondary': 'var(--color-text-secondary, #7A7A7A)',
       },
       fontFamily: {
         sans: ['var(--font-sans, "Inter")', 'system-ui', 'sans-serif'],

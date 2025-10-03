@@ -1,6 +1,7 @@
 ---
 /**
  * Navigation - Menú de navegación principal (desktop)
+ * Diseño minimalista con underline animado
  */
 
 const currentPath = Astro.url.pathname;
@@ -8,16 +9,9 @@ const currentPath = Astro.url.pathname;
 const navItems = [
   { href: '/', label: 'Inicio' },
   { href: '/productos', label: 'Productos' },
-  {
-    href: '#',
-    label: 'Categorías',
-    children: [
-      { href: '/productos/tecnologia', label: 'Tecnología' },
-      { href: '/productos/hogar', label: 'Hogar' },
-      { href: '/productos/moda', label: 'Moda' },
-      { href: '/productos/deportes', label: 'Deportes' },
-    ]
-  },
+  { href: '/productos/tecnologia', label: 'Tecnología' },
+  { href: '/productos/hogar', label: 'Hogar' },
+  { href: '/productos/moda', label: 'Moda' },
 ];
 
 function isActive(href: string): boolean {
@@ -26,62 +20,44 @@ function isActive(href: string): boolean {
 }
 ---
 
-<nav class="hidden md:block">
-  <ul class="flex items-center gap-6">
+<nav class="flex items-center justify-center">
+  <ul class="flex items-center gap-8">
     {navItems.map((item) => (
-      <li class="relative group">
+      <li class="nav-item">
         <a
           href={item.href}
           class={`
-            font-medium transition-colors
+            nav-link relative
+            text-sm font-medium
+            transition-colors duration-200
             ${isActive(item.href)
-              ? 'text-primary'
-              : 'text-text hover:text-primary'
+              ? 'text-black font-semibold'
+              : 'text-gray-800 hover:text-black'
             }
           `}
         >
           {item.label}
-          {item.children && (
-            <svg
-              class="inline-block w-4 h-4 ml-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          )}
-        </a>
 
-        {/* Dropdown menú (si tiene children) */}
-        {item.children && (
-          <div class="absolute left-0 mt-2 w-48 bg-background border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-            <ul class="py-2">
-              {item.children.map((child) => (
-                <li>
-                  <a
-                    href={child.href}
-                    class={`
-                      block px-4 py-2 text-sm transition-colors
-                      ${isActive(child.href)
-                        ? 'text-primary bg-gray-50'
-                        : 'text-text hover:bg-gray-50'
-                      }
-                    `}
-                  >
-                    {child.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          <!-- Underline animado -->
+          <span class={`
+            nav-underline absolute left-0 -bottom-1 h-0.5 bg-black
+            transition-all duration-300 ease-out
+            ${isActive(item.href) ? 'w-full' : 'w-0'}
+          `}></span>
+        </a>
       </li>
     ))}
   </ul>
 </nav>
+
+<style>
+  /* Underline animado en hover */
+  .nav-link:hover .nav-underline {
+    width: 100%;
+  }
+
+  /* Asegurar que el link activo siempre tenga underline */
+  .nav-link:hover {
+    font-weight: 600;
+  }
+</style>
