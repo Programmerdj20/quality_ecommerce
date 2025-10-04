@@ -79,11 +79,11 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
     <!-- Botón Volver Arriba -->
     <button
       id="scroll-to-top"
-      class="fixed bottom-6 right-6 w-12 h-12 bg-primary text-white rounded-full shadow-lg hover:bg-primary/90 transition-all opacity-0 pointer-events-none z-40 flex items-center justify-center"
+      class="fixed bottom-6 right-6 w-14 h-14 bg-black/80 backdrop-blur-sm text-white rounded-full shadow-2xl hover:bg-black hover:scale-110 active:scale-95 transition-all duration-300 opacity-0 pointer-events-none z-40 flex items-center justify-center border-2 border-white/20 hover:border-white/40"
       aria-label="Volver arriba"
     >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
       </svg>
     </button>
 

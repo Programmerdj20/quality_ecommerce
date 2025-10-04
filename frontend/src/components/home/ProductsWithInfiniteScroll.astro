@@ -68,6 +68,7 @@ const { initialProducts, allProductsJson } = Astro.props;
 
   // Estado global
   let currentCategory = 'all';
+  let currentPriceRange = { minPrice: 0, maxPrice: 5000000 };
   let currentPage = 1; // Empezamos en página 1 porque ya renderizamos la página 0
   let filteredProducts = [...allProducts];
   let isLoading = false;
@@ -94,13 +95,23 @@ const { initialProducts, allProductsJson } = Astro.props;
   }
 
   /**
-   * Filtrar productos por categoría
+   * Filtrar productos por categoría y rango de precio
    */
-  function filterProductsByCategory(category) {
-    if (category === 'all') {
-      return shuffleArray(allProducts.filter(p => p.activo));
+  function filterProducts(category, priceRange) {
+    let filtered = allProducts.filter(p => p.activo);
+
+    // Filtrar por categoría
+    if (category !== 'all') {
+      filtered = filtered.filter(p => p.categoria === category);
     }
-    return shuffleArray(allProducts.filter(p => p.activo && p.categoria === category));
+
+    // Filtrar por rango de precio (usar precioDescuento si existe, sino precio)
+    filtered = filtered.filter(p => {
+      const finalPrice = p.precioDescuento || p.precio;
+      return finalPrice >= priceRange.minPrice && finalPrice <= priceRange.maxPrice;
+    });
+
+    return shuffleArray(filtered);
   }
 
   /**
@@ -275,15 +286,14 @@ const { initialProducts, allProductsJson } = Astro.props;
   }
 
   /**
-   * Cambiar categoría
+   * Aplicar filtros (categoría + precio)
    */
-  function changeCategory(category) {
-    currentCategory = category;
+  function applyFilters() {
     currentPage = 0;
     hasMore = true;
 
     // Filtrar productos
-    filteredProducts = filterProductsByCategory(category);
+    filteredProducts = filterProducts(currentCategory, currentPriceRange);
 
     // Limpiar UI
     clearGrid();
@@ -311,6 +321,22 @@ const { initialProducts, allProductsJson } = Astro.props;
     grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  /**
+   * Cambiar categoría
+   */
+  function changeCategory(category) {
+    currentCategory = category;
+    applyFilters();
+  }
+
+  /**
+   * Cambiar rango de precio
+   */
+  function changePriceRange(minPrice, maxPrice) {
+    currentPriceRange = { minPrice, maxPrice };
+    applyFilters();
+  }
+
   // Intersection Observer para scroll infinito
   const observer = new IntersectionObserver(
     (entries) => {
@@ -333,6 +359,12 @@ const { initialProducts, allProductsJson } = Astro.props;
   window.addEventListener('categoryChange', (e) => {
     const { category } = e.detail;
     changeCategory(category);
+  });
+
+  // Escuchar cambios de rango de precio
+  window.addEventListener('priceRangeChange', (e) => {
+    const { minPrice, maxPrice } = e.detail;
+    changePriceRange(minPrice, maxPrice);
   });
 
   // Configurar estado inicial basado en productos cargados desde el servidor

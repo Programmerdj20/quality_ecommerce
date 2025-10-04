@@ -57,6 +57,65 @@ const { categories } = Astro.props;
         ))}
       </ul>
     </nav>
+
+    <!-- Separador -->
+    <div class="border-t border-gray-200"></div>
+
+    <!-- Filtro de Precio -->
+    <div class="p-4">
+      <h3 class="font-heading font-bold text-base text-gray-800 mb-4">Filtrar por Precio</h3>
+
+      <div class="space-y-4">
+        <!-- Rango de Precio -->
+        <div class="space-y-3">
+          <!-- Slider Mínimo -->
+          <div>
+            <label for="price-min" class="block text-xs text-gray-600 mb-2">Precio Mínimo</label>
+            <input
+              type="range"
+              id="price-min"
+              min="0"
+              max="5000000"
+              step="50000"
+              value="0"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 in-range:bg-gray-300 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-black [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:hover:bg-gray-800 [&::-webkit-slider-thumb]:transition-colors [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-black [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:hover:bg-gray-800 [&::-moz-range-thumb]:transition-colors"
+            />
+            <div id="price-min-value" class="text-sm font-semibold text-gray-800 mt-1">$0</div>
+          </div>
+
+          <!-- Slider Máximo -->
+          <div>
+            <label for="price-max" class="block text-xs text-gray-600 mb-2">Precio Máximo</label>
+            <input
+              type="range"
+              id="price-max"
+              min="0"
+              max="5000000"
+              step="50000"
+              value="5000000"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 in-range:bg-gray-300 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-black [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:hover:bg-gray-800 [&::-webkit-slider-thumb]:transition-colors [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-black [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:hover:bg-gray-800 [&::-moz-range-thumb]:transition-colors"
+            />
+            <div id="price-max-value" class="text-sm font-semibold text-gray-800 mt-1">$5,000,000</div>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="flex gap-2 pt-2">
+          <button
+            id="apply-price-filter"
+            class="flex-1 px-4 py-2 bg-black text-white rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+          >
+            Aplicar
+          </button>
+          <button
+            id="clear-price-filter"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-200 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+          >
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </aside>
 
@@ -104,9 +163,75 @@ const { categories } = Astro.props;
       ))}
     </div>
   </div>
+
+  <!-- Filtro de Precio Mobile -->
+  <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4 mt-4">
+    <h3 class="font-heading font-bold text-base text-gray-800 mb-4">Filtrar por Precio</h3>
+
+    <div class="space-y-4">
+      <!-- Rango de Precio -->
+      <div class="space-y-3">
+        <!-- Slider Mínimo -->
+        <div>
+          <label for="price-min-mobile" class="block text-xs text-gray-600 mb-2">Precio Mínimo</label>
+          <input
+            type="range"
+            id="price-min-mobile"
+            min="0"
+            max="5000000"
+            step="50000"
+            value="0"
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 in-range:bg-gray-300 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-black [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:hover:bg-gray-800 [&::-webkit-slider-thumb]:transition-colors [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-black [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:hover:bg-gray-800 [&::-moz-range-thumb]:transition-colors"
+          />
+          <div id="price-min-value-mobile" class="text-sm font-semibold text-gray-800 mt-1">$0</div>
+        </div>
+
+        <!-- Slider Máximo -->
+        <div>
+          <label for="price-max-mobile" class="block text-xs text-gray-600 mb-2">Precio Máximo</label>
+          <input
+            type="range"
+            id="price-max-mobile"
+            min="0"
+            max="5000000"
+            step="50000"
+            value="5000000"
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 in-range:bg-gray-300 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-black [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:hover:bg-gray-800 [&::-webkit-slider-thumb]:transition-colors [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-black [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:hover:bg-gray-800 [&::-moz-range-thumb]:transition-colors"
+          />
+          <div id="price-max-value-mobile" class="text-sm font-semibold text-gray-800 mt-1">$5,000,000</div>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="flex gap-2 pt-2">
+        <button
+          id="apply-price-filter-mobile"
+          class="flex-1 px-4 py-2 bg-black text-white rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+        >
+          Aplicar
+        </button>
+        <button
+          id="clear-price-filter-mobile"
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-200 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+        >
+          Limpiar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
+  // Función para formatear precio
+  function formatPrice(price: number): string {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price);
+  }
+
   // Toggle del menú mobile
   const toggleBtn = document.getElementById('mobile-category-toggle');
   const menu = document.getElementById('mobile-category-menu');
@@ -165,5 +290,121 @@ const { categories } = Astro.props;
       // Disparar evento personalizado para filtrar productos
       window.dispatchEvent(new CustomEvent('categoryChange', { detail: { category } }));
     });
+  });
+
+  // ===== FILTRO DE PRECIO - DESKTOP =====
+  const priceMinInput = document.getElementById('price-min') as HTMLInputElement;
+  const priceMaxInput = document.getElementById('price-max') as HTMLInputElement;
+  const priceMinValue = document.getElementById('price-min-value');
+  const priceMaxValue = document.getElementById('price-max-value');
+  const applyPriceBtn = document.getElementById('apply-price-filter');
+  const clearPriceBtn = document.getElementById('clear-price-filter');
+
+  // Actualizar valores mostrados en tiempo real
+  priceMinInput?.addEventListener('input', () => {
+    const minVal = parseInt(priceMinInput.value);
+    const maxVal = parseInt(priceMaxInput.value);
+
+    // Asegurar que min no sea mayor que max
+    if (minVal > maxVal) {
+      priceMinInput.value = maxVal.toString();
+    }
+
+    if (priceMinValue) {
+      priceMinValue.textContent = formatPrice(parseInt(priceMinInput.value));
+    }
+  });
+
+  priceMaxInput?.addEventListener('input', () => {
+    const minVal = parseInt(priceMinInput.value);
+    const maxVal = parseInt(priceMaxInput.value);
+
+    // Asegurar que max no sea menor que min
+    if (maxVal < minVal) {
+      priceMaxInput.value = minVal.toString();
+    }
+
+    if (priceMaxValue) {
+      priceMaxValue.textContent = formatPrice(parseInt(priceMaxInput.value));
+    }
+  });
+
+  // Aplicar filtro de precio
+  applyPriceBtn?.addEventListener('click', () => {
+    const minPrice = parseInt(priceMinInput.value);
+    const maxPrice = parseInt(priceMaxInput.value);
+
+    window.dispatchEvent(new CustomEvent('priceRangeChange', {
+      detail: { minPrice, maxPrice }
+    }));
+  });
+
+  // Limpiar filtro de precio
+  clearPriceBtn?.addEventListener('click', () => {
+    if (priceMinInput) priceMinInput.value = '0';
+    if (priceMaxInput) priceMaxInput.value = '5000000';
+    if (priceMinValue) priceMinValue.textContent = formatPrice(0);
+    if (priceMaxValue) priceMaxValue.textContent = formatPrice(5000000);
+
+    window.dispatchEvent(new CustomEvent('priceRangeChange', {
+      detail: { minPrice: 0, maxPrice: 5000000 }
+    }));
+  });
+
+  // ===== FILTRO DE PRECIO - MOBILE =====
+  const priceMinInputMobile = document.getElementById('price-min-mobile') as HTMLInputElement;
+  const priceMaxInputMobile = document.getElementById('price-max-mobile') as HTMLInputElement;
+  const priceMinValueMobile = document.getElementById('price-min-value-mobile');
+  const priceMaxValueMobile = document.getElementById('price-max-value-mobile');
+  const applyPriceBtnMobile = document.getElementById('apply-price-filter-mobile');
+  const clearPriceBtnMobile = document.getElementById('clear-price-filter-mobile');
+
+  // Actualizar valores mostrados en tiempo real (Mobile)
+  priceMinInputMobile?.addEventListener('input', () => {
+    const minVal = parseInt(priceMinInputMobile.value);
+    const maxVal = parseInt(priceMaxInputMobile.value);
+
+    if (minVal > maxVal) {
+      priceMinInputMobile.value = maxVal.toString();
+    }
+
+    if (priceMinValueMobile) {
+      priceMinValueMobile.textContent = formatPrice(parseInt(priceMinInputMobile.value));
+    }
+  });
+
+  priceMaxInputMobile?.addEventListener('input', () => {
+    const minVal = parseInt(priceMinInputMobile.value);
+    const maxVal = parseInt(priceMaxInputMobile.value);
+
+    if (maxVal < minVal) {
+      priceMaxInputMobile.value = minVal.toString();
+    }
+
+    if (priceMaxValueMobile) {
+      priceMaxValueMobile.textContent = formatPrice(parseInt(priceMaxInputMobile.value));
+    }
+  });
+
+  // Aplicar filtro de precio (Mobile)
+  applyPriceBtnMobile?.addEventListener('click', () => {
+    const minPrice = parseInt(priceMinInputMobile.value);
+    const maxPrice = parseInt(priceMaxInputMobile.value);
+
+    window.dispatchEvent(new CustomEvent('priceRangeChange', {
+      detail: { minPrice, maxPrice }
+    }));
+  });
+
+  // Limpiar filtro de precio (Mobile)
+  clearPriceBtnMobile?.addEventListener('click', () => {
+    if (priceMinInputMobile) priceMinInputMobile.value = '0';
+    if (priceMaxInputMobile) priceMaxInputMobile.value = '5000000';
+    if (priceMinValueMobile) priceMinValueMobile.textContent = formatPrice(0);
+    if (priceMaxValueMobile) priceMaxValueMobile.textContent = formatPrice(5000000);
+
+    window.dispatchEvent(new CustomEvent('priceRangeChange', {
+      detail: { minPrice: 0, maxPrice: 5000000 }
+    }));
   });
 </script>

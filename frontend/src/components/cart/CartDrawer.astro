@@ -78,13 +78,13 @@
       <a
         href="/checkout"
         id="checkout-btn"
-        class="block w-full py-4 bg-accent text-white text-center font-bold rounded-lg hover:bg-accent/90 transition-all hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
+        class="block w-full py-4 bg-white text-black-pure text-center font-bold rounded-lg border-2 border-black-pure transition-all duration-300 hover:bg-black-pure hover:text-white-pure hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
       >
-        Proceder al Pago
+        Ir a Pagar
       </a>
       <button
         id="continue-shopping-btn"
-        class="block w-full py-3 bg-white text-primary text-center font-semibold border-2 border-primary rounded-lg hover:bg-primary hover:text-white transition-colors"
+        class="block w-full py-3 bg-white text-primary text-center font-semibold border-2 border-primary rounded-lg hover:bg-primary hover:text-white-pure transition-colors"
       >
         Seguir Comprando
       </button>
@@ -96,6 +96,38 @@
   import { cartStore, removeFromCart, incrementQuantity, decrementQuantity, formatPrice } from '@/stores/cartStore';
   import { toastSuccess, toastInfo, toastWarning } from '@/stores/toastStore';
   import type { Cart } from '@/types';
+
+  // Limpiar productos con IDs en formato antiguo del localStorage
+  // Esto elimina productos que no tienen el formato correcto de productId
+  function cleanOldCartItems() {
+    try {
+      const cartItems = localStorage.getItem('cart-items');
+      if (cartItems) {
+        const items = JSON.parse(cartItems);
+        // Filtrar items que no tengan todos los campos requeridos o tengan IDs en formato antiguo
+        const validItems = items.filter((item: any) =>
+          item.productId &&
+          item.sku &&
+          item.nombre &&
+          item.precio &&
+          item.imagen &&
+          typeof item.stockDisponible === 'number' &&
+          // Verificar que el productId sea un número (formato actual)
+          !isNaN(parseInt(item.productId))
+        );
+
+        if (validItems.length !== items.length) {
+          localStorage.setItem('cart-items', JSON.stringify(validItems));
+          console.log('Se limpiaron productos antiguos del carrito');
+        }
+      }
+    } catch (error) {
+      console.error('Error al limpiar items antiguos:', error);
+    }
+  }
+
+  // Ejecutar limpieza al cargar
+  cleanOldCartItems();
 
   // Elementos del DOM
   const drawer = document.getElementById('cart-drawer');
@@ -149,23 +181,21 @@
           <div class="flex-1 min-w-0">
             <h4 class="font-semibold text-text line-clamp-2 mb-1">${item.nombre}</h4>
             <p class="text-sm text-text-secondary mb-2">SKU: ${item.sku}</p>
-            <div class="flex items-center gap-4">
-              <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-                <button class="decrement-btn w-7 h-7 flex items-center justify-center hover:bg-white rounded transition-colors" data-product-id="${item.productId}">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
-                </button>
-                <span class="item-quantity w-8 text-center font-semibold">${item.cantidad}</span>
-                <button class="increment-btn w-7 h-7 flex items-center justify-center hover:bg-white rounded transition-colors" data-product-id="${item.productId}" data-stock="${item.stockDisponible}">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                </button>
-              </div>
-              <div class="text-sm text-text-secondary">${formatPrice(item.precio)} c/u</div>
+            <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1 w-fit mb-2">
+              <button class="decrement-btn w-7 h-7 flex items-center justify-center hover:bg-white rounded transition-colors" data-product-id="${item.productId}">
+                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+              </button>
+              <span class="item-quantity w-8 text-center font-semibold">${item.cantidad}</span>
+              <button class="increment-btn w-7 h-7 flex items-center justify-center hover:bg-white rounded transition-colors" data-product-id="${item.productId}" data-stock="${item.stockDisponible}">
+                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              </button>
             </div>
+            <div class="text-sm font-medium text-text-secondary">Precio unitario: <span class="text-text">${formatPrice(item.precio)}</span></div>
             ${item.cantidad >= item.stockDisponible ? '<p class="text-xs text-orange-600 mt-1">Stock máximo alcanzado</p>' : ''}
           </div>
           <div class="flex flex-col items-end justify-between">
             <button class="remove-btn text-text-secondary hover:text-red-600 transition-colors p-1" data-product-id="${item.productId}">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
             <div class="text-right">
               <p class="font-bold text-lg text-primary">${formatPrice(item.precio * item.cantidad)}</p>
@@ -173,9 +203,6 @@
           </div>
         </div>
       `).join('');
-
-      // Agregar event listeners a los botones
-      attachItemEventListeners();
     }
 
     // Actualizar totales
@@ -193,65 +220,75 @@
     if (totalEl) totalEl.textContent = formatPrice(cart.total);
   }
 
-  // Función para agregar event listeners a los botones de los items
-  function attachItemEventListeners() {
-    // Botones de incrementar
-    document.querySelectorAll('.increment-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const target = e.currentTarget as HTMLElement;
-        const productId = target.dataset.productId;
-        const stock = parseInt(target.dataset.stock || '0');
+  // Delegación de eventos para botones del carrito (sobrevive al re-render)
+  const cartItemsContainer = document.getElementById('cart-items-container');
 
-        if (productId) {
-          const cart = cartStore.get();
-          const item = cart.items.find(i => i.productId === productId);
+  cartItemsContainer?.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
 
-          if (item && item.cantidad >= stock) {
-            toastWarning('Has alcanzado el stock máximo disponible');
-          } else {
-            incrementQuantity(productId);
+    // Botón de incrementar
+    const incrementBtn = target.closest('.increment-btn');
+    if (incrementBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const productId = (incrementBtn as HTMLElement).dataset.productId;
+      const stock = parseInt((incrementBtn as HTMLElement).dataset.stock || '0');
+
+      if (productId) {
+        const cart = cartStore.get();
+        const item = cart.items.find(i => i.productId === productId);
+
+        if (item && item.cantidad >= stock) {
+          toastWarning('Has alcanzado el stock máximo disponible');
+        } else {
+          incrementQuantity(productId);
+        }
+      }
+      return;
+    }
+
+    // Botón de decrementar
+    const decrementBtn = target.closest('.decrement-btn');
+    if (decrementBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const productId = (decrementBtn as HTMLElement).dataset.productId;
+      if (productId) {
+        const cart = cartStore.get();
+        const item = cart.items.find(i => i.productId === productId);
+
+        if (item && item.cantidad === 1) {
+          toastInfo('Producto eliminado del carrito');
+        }
+
+        decrementQuantity(productId);
+      }
+      return;
+    }
+
+    // Botón de eliminar
+    const removeBtn = target.closest('.remove-btn');
+    if (removeBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const productId = (removeBtn as HTMLElement).dataset.productId;
+      if (productId) {
+        const cart = cartStore.get();
+        const item = cart.items.find(i => i.productId === productId);
+
+        if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+          removeFromCart(productId);
+          if (item) {
+            toastSuccess(`${item.nombre} eliminado del carrito`);
           }
         }
-      });
-    });
-
-    // Botones de decrementar
-    document.querySelectorAll('.decrement-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const target = e.currentTarget as HTMLElement;
-        const productId = target.dataset.productId;
-        if (productId) {
-          const cart = cartStore.get();
-          const item = cart.items.find(i => i.productId === productId);
-
-          if (item && item.cantidad === 1) {
-            toastInfo('Producto eliminado del carrito');
-          }
-
-          decrementQuantity(productId);
-        }
-      });
-    });
-
-    // Botones de eliminar
-    document.querySelectorAll('.remove-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const target = e.currentTarget as HTMLElement;
-        const productId = target.dataset.productId;
-        if (productId) {
-          const cart = cartStore.get();
-          const item = cart.items.find(i => i.productId === productId);
-
-          if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-            removeFromCart(productId);
-            if (item) {
-              toastSuccess(`${item.nombre} eliminado del carrito`);
-            }
-          }
-        }
-      });
-    });
-  }
+      }
+      return;
+    }
+  });
 
   // Suscribirse a cambios en el carrito
   cartStore.subscribe((cart) => {
