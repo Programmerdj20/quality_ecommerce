@@ -314,40 +314,50 @@ Para soporte o preguntas, contacta a [tu-email@dominio.com]
 - [x] Cliente Strapi API
 - [x] Sistema de temas dinámicos
 - [x] Configuración de variables de entorno
+- [x] **Componentes de productos** (ProductCard, ProductGrid, ProductCarousel)
+- [x] **Páginas del catálogo** (index.astro, productos/index.astro, productos/[slug].astro)
+- [x] **Carrito de compras completo** (CartDrawer, CartItem, cartStore con persistencia)
+- [x] **Sistema de toasts** (ToastContainer, toastStore)
+- [x] **Layouts principales** (Header, Footer, Navigation, MobileMenu)
+- [x] **Sistema de filtros** (CategorySidebar con filtro de precio por rango)
+- [x] **Búsqueda** (SearchModal)
+- [x] **Scroll infinito** (ProductsWithInfiniteScroll)
+- [x] **Animaciones y UX** (scroll animations, hover effects, marquesina de medios de pago)
+- [x] **Home completo** (BannerCarousel, sección de beneficios, medios de pago)
 
 ### 🚧 En Desarrollo
-- [ ] Componentes de productos (ProductCard, ProductGrid, ProductDetail)
-- [ ] Páginas del catálogo
-- [ ] Carrito de compras con Nanostores
-- [ ] Componentes SEO (Schema.org, sitemap)
-- [ ] Checkout y formulario
-- [ ] Integración completa de Mercado Pago
-- [ ] Autenticación de usuarios
-- [ ] Dashboard de usuario
-- [ ] Layouts principales
-- [ ] Instalación y configuración de Strapi
+- [x] **Checkout y Mercado Pago** (En progreso - iniciando implementación)
+  - [ ] API Routes para crear preferencias
+  - [ ] Webhooks de Mercado Pago
+  - [ ] Página de checkout con formulario
+  - [ ] Páginas de resultado (success, pending, failure)
+  - [ ] Store de órdenes
 
-### 📋 Pendiente
+### 📋 Pendiente (Prioridad Media-Baja)
+- [ ] Componentes SEO (Schema.org, sitemap dinámico)
+- [ ] Autenticación de usuarios (login/registro)
+- [ ] Dashboard de usuario con historial de pedidos
+- [ ] Instalación y configuración de Strapi
 - [ ] Content Types de Strapi
-- [ ] Seed data de temas
-- [ ] Webhooks de Mercado Pago
+- [ ] Seed data de temas en Strapi
 - [ ] Emails transaccionales
-- [ ] Testing
+- [ ] Testing (Unit + E2E)
 - [ ] Documentación de API contable
 - [ ] Guía de deployment completa
 
-## 🏗️ Próximos Pasos
+## 🏗️ Próximos Pasos Inmediatos
 
-1. Completar componentes de productos
-2. Implementar carrito de compras
-3. Crear páginas del catálogo
-4. Integrar checkout con Mercado Pago
+1. ✅ ~~Componentes de productos~~ **COMPLETADO**
+2. ✅ ~~Carrito de compras~~ **COMPLETADO**
+3. ✅ ~~Páginas del catálogo~~ **COMPLETADO**
+4. 🚧 **Integrar checkout con Mercado Pago** (En progreso)
 5. Configurar Strapi Content Types
-6. Implementar SEO completo
-7. Testing y optimización
-8. Despliegue a producción
+6. Implementar autenticación de usuarios
+7. Implementar SEO completo
+8. Testing y optimización
+9. Despliegue a producción
 
 ---
 
-**Versión:** 0.1.0 (Alpha)
-**Última actualización:** 2025-01-30
+**Versión:** 0.2.0 (Beta)
+**Última actualización:** 2025-10-08

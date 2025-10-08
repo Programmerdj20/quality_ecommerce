@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@mercadopago/sdk-js':
+        specifier: ^0.0.3
+        version: 0.0.3
       '@nanostores/persistent':
         specifier: ^1.1.0
         version: 1.1.0(nanostores@1.0.1)
@@ -376,6 +379,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@mercadopago/sdk-js@0.0.3':
+    resolution: {integrity: sha512-kO48DNLHdfFAp3on12nuKdqNlEmw1x3+nM6wLd04BdWOXoFcAhkNMQV3AyUIanXdO/bB/dENakdacLT29297EQ==}
 
   '@nanostores/persistent@1.1.0':
     resolution: {integrity: sha512-e6vfv7H99VkCfSoNTR/qNVMj6vXwWcsEL+LCQQamej5GK9iDefKxPCJjdOpBi1p4lNCFIQ+9VjYF1spvvc2p6A==}
@@ -1983,6 +1989,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@mercadopago/sdk-js@0.0.3': {}
 
   '@nanostores/persistent@1.1.0(nanostores@1.0.1)':
     dependencies:

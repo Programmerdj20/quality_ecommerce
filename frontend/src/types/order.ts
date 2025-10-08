@@ -97,6 +97,46 @@ export interface MercadoPagoPreference {
   sandbox_init_point?: string;
 }
 
+// Request para crear preferencia de Mercado Pago
+export interface CreatePreferenceRequest {
+  items: Array<{
+    title: string;
+    quantity: number;
+    unit_price: number;
+    currency_id: string;
+    description?: string;
+    picture_url?: string;
+  }>;
+  payer: {
+    name?: string;
+    surname?: string;
+    email: string;
+    phone?: {
+      area_code?: string;
+      number: string;
+    };
+    identification?: {
+      type: string;
+      number: string;
+    };
+    address?: {
+      street_name?: string;
+      street_number?: string;
+      zip_code?: string;
+    };
+  };
+  back_urls: {
+    success: string;
+    failure: string;
+    pending: string;
+  };
+  auto_return?: 'approved' | 'all';
+  external_reference?: string;
+  notification_url?: string;
+  statement_descriptor?: string;
+  metadata?: Record<string, any>;
+}
+
 // Webhook de Mercado Pago
 export interface MercadoPagoWebhook {
   id: number;
@@ -111,4 +151,30 @@ export interface MercadoPagoWebhook {
   data: {
     id: string;
   };
+}
+
+// Información de pago de Mercado Pago
+export interface MercadoPagoPaymentInfo {
+  id: number;
+  status: 'pending' | 'approved' | 'authorized' | 'in_process' | 'in_mediation' | 'rejected' | 'cancelled' | 'refunded' | 'charged_back';
+  status_detail: string;
+  payment_type_id: string;
+  payment_method_id: string;
+  transaction_amount: number;
+  currency_id: string;
+  description: string;
+  external_reference?: string;
+  payer: {
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    identification?: {
+      type: string;
+      number: string;
+    };
+  };
+  metadata?: Record<string, any>;
+  date_created: string;
+  date_approved?: string;
+  date_last_updated: string;
 }

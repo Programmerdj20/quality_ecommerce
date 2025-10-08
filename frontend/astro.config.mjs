@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'static', // Genera sitio estático
+  output: 'hybrid', // Permite SSR para API routes y SSG para páginas estáticas
   server: {
     port: 4321,
     host: true
@@ -12,7 +12,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     ssr: {
-      noExternal: ['nanostores']
+      noExternal: ['nanostores', 'mercadopago']
     }
   },
   // Configuración de rutas

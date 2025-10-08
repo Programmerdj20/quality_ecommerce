@@ -157,6 +157,17 @@
   continueBtn?.addEventListener('click', closeDrawer);
   overlay?.addEventListener('click', closeDrawer);
 
+  // Validar carrito antes de ir al checkout
+  const checkoutBtn = document.getElementById('checkout-btn');
+  checkoutBtn?.addEventListener('click', (e) => {
+    const cart = cartStore.get();
+    if (cart.items.length === 0) {
+      e.preventDefault();
+      toastWarning('Tu carrito está vacío');
+      closeDrawer();
+    }
+  });
+
   // Exponer función globalmente para que el CartWidget pueda abrirlo
   (window as any).openCart = openDrawer;
   (window as any).closeCart = closeDrawer;
