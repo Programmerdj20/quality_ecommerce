@@ -42,13 +42,16 @@ export interface ClienteInfo {
   direccion: DireccionEnvio;
 }
 
+export type PaymentMethod = 'mercadopago' | 'transferencia';
+
 export interface PagoInfo {
-  metodo: 'mercadopago';
+  metodo: PaymentMethod;
   mercadoPagoId?: string;
+  transferenciaCuenta?: string; // Número de cuenta o llave para transferencias
   estado: PaymentStatus;
   fechaPago?: string;
   detalles?: {
-    metodoPago?: string; // tarjeta, pse, efectivo
+    metodoPago?: string; // tarjeta, pse, efectivo, transferencia
     ultimosDigitos?: string;
     cuotas?: number;
   };

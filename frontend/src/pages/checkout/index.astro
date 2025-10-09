@@ -3,10 +3,12 @@
  * Checkout Page - Página de pago
  *
  * Formulario para completar la información del cliente
- * y proceder al pago con Mercado Pago
+ * y proceder al pago con Mercado Pago o Transferencia Bancaria
  */
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import CheckoutCartItems from '@/components/checkout/CheckoutCartItems.astro';
+import PaymentMethodSelector from '@/components/checkout/PaymentMethodSelector.astro';
 ---
 
 <BaseLayout
@@ -26,7 +28,11 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <!-- Formulario de Checkout (2/3) -->
-          <div class="lg:col-span-2">
+          <div class="lg:col-span-2 order-2 lg:order-1">
+            <!-- Selector de Método de Pago -->
+            <PaymentMethodSelector />
+
+            <!-- Formulario de Información -->
             <div class="bg-white rounded-2xl shadow-md p-6 md:p-8">
               <h2 class="font-heading font-bold text-2xl text-gray-800 mb-6">
                 Información de Contacto
@@ -253,16 +259,15 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
           </div>
 
           <!-- Resumen del Pedido (1/3) -->
-          <div class="lg:col-span-1">
-            <div class="bg-white rounded-2xl shadow-md p-6 sticky top-24">
+          <div class="lg:col-span-1 order-1 lg:order-2">
+            <!-- Productos del Carrito (Sticky) -->
+            <CheckoutCartItems />
+
+            <!-- Resumen de Totales (Sticky) -->
+            <div class="bg-white rounded-2xl shadow-md p-6 lg:sticky lg:top-24">
               <h2 class="font-heading font-bold text-xl text-gray-800 mb-4">
                 Resumen del Pedido
               </h2>
-
-              <!-- Items del Carrito -->
-              <div id="cartSummary" class="space-y-4 mb-6">
-                <!-- Se llenará dinámicamente con JavaScript -->
-              </div>
 
               <!-- Totales -->
               <div class="border-t border-gray-200 pt-4 space-y-2">
@@ -304,7 +309,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
-  import { $cart } from '@/stores/cartStore';
+  import { cartStore } from '@/stores/cartStore';
   import {
     setCheckoutCustomerInfo,
     setCurrentPreferenceId,
@@ -320,6 +325,9 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
   script.async = true;
   document.head.appendChild(script);
 
+  // Variable para almacenar el método de pago seleccionado
+  let selectedPaymentMethod: 'mercadopago' | 'transferencia' = 'mercadopago';
+
   // Formatear moneda
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CO', {
@@ -329,31 +337,14 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     }).format(amount);
   };
 
-  // Renderizar resumen del carrito
-  function renderCartSummary() {
-    const cart = $cart.get();
-    const summaryContainer = document.getElementById('cartSummary');
+  // Renderizar totales del carrito
+  function renderCartTotals() {
+    const cart = cartStore.get();
     const subtotalEl = document.getElementById('subtotalAmount');
     const ivaEl = document.getElementById('ivaAmount');
     const totalEl = document.getElementById('totalAmount');
 
-    if (!summaryContainer || !subtotalEl || !ivaEl || !totalEl) return;
-
-    // Renderizar items
-    summaryContainer.innerHTML = cart.items
-      .map(
-        (item) => `
-        <div class="flex gap-3">
-          <img src="${item.imagen}" alt="${item.nombre}" class="w-16 h-16 object-cover rounded-lg" />
-          <div class="flex-1">
-            <h4 class="font-semibold text-sm text-gray-800 line-clamp-2">${item.nombre}</h4>
-            <p class="text-sm text-gray-600">Cantidad: ${item.cantidad}</p>
-            <p class="text-sm font-semibold text-gray-800">${formatCurrency(item.precio * item.cantidad)}</p>
-          </div>
-        </div>
-      `
-      )
-      .join('');
+    if (!subtotalEl || !ivaEl || !totalEl) return;
 
     // Renderizar totales
     const iva = cart.subtotal * 0.19;
@@ -361,6 +352,22 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     ivaEl.textContent = formatCurrency(iva);
     totalEl.textContent = formatCurrency(cart.total);
   }
+
+  // Escuchar cambios en el método de pago
+  document.addEventListener('paymentMethodChanged', (e: any) => {
+    selectedPaymentMethod = e.detail.method;
+    console.log('Método de pago seleccionado:', selectedPaymentMethod);
+
+    // Actualizar texto del botón según método seleccionado
+    const btnText = document.getElementById('btnText');
+    if (btnText) {
+      if (selectedPaymentMethod === 'transferencia') {
+        btnText.textContent = 'Generar Pedido';
+      } else {
+        btnText.textContent = 'Continuar al Pago';
+      }
+    }
+  });
 
   // Manejar submit del formulario
   async function handleSubmit(e: Event) {
@@ -370,7 +377,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     const formData = new FormData(form);
 
     // Validar que el carrito no esté vacío
-    const cart = $cart.get();
+    const cart = cartStore.get();
     if (cart.items.length === 0) {
       alert('Tu carrito está vacío');
       window.location.href = '/';
@@ -411,45 +418,58 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     }
 
     try {
-      // Crear preferencia en Mercado Pago
-      const response = await fetch('/api/checkout/create-preference', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          items: cart.items,
-          customerInfo: checkoutData,
-          orderReference,
-        }),
-      });
+      // Flujo según método de pago seleccionado
+      if (selectedPaymentMethod === 'transferencia') {
+        // Flujo de Transferencia Bancaria
+        // TODO: Aquí se debería crear el pedido en el backend con estado "pendiente"
+        // y redirigir a una página de confirmación con instrucciones
 
-      if (!response.ok) {
-        throw new Error('Error al crear la preferencia de pago');
+        alert(`Pedido creado exitosamente!\n\nReferencia: ${orderReference}\n\nRealiza la transferencia a la cuenta:\nLlave: 98664389\n\nEnvía el comprobante al correo que recibirás por email.`);
+
+        // Redirigir a página de confirmación (pending)
+        window.location.href = '/checkout/pending';
+
+      } else {
+        // Flujo de Mercado Pago
+        const response = await fetch('/api/checkout/create-preference', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            items: cart.items,
+            customerInfo: checkoutData,
+            orderReference,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al crear la preferencia de pago');
+        }
+
+        const data = await response.json();
+
+        // Guardar preference ID
+        setCurrentPreferenceId(data.preferenceId);
+
+        // Inicializar Wallet de Mercado Pago
+        const mp = new (window as any).MercadoPago(import.meta.env.PUBLIC_MP_PUBLIC_KEY);
+        const bricksBuilder = mp.bricks();
+
+        // Ocultar formulario y mostrar wallet
+        form.classList.add('hidden');
+        const walletContainer = document.getElementById('walletContainer');
+        if (walletContainer) {
+          walletContainer.classList.remove('hidden');
+        }
+
+        // Renderizar wallet brick
+        await bricksBuilder.create('wallet', 'wallet_container', {
+          initialization: {
+            preferenceId: data.preferenceId,
+          },
+        });
       }
-
-      const data = await response.json();
-
-      // Guardar preference ID
-      setCurrentPreferenceId(data.preferenceId);
-
-      // Inicializar Wallet de Mercado Pago
-      const mp = new (window as any).MercadoPago(import.meta.env.PUBLIC_MP_PUBLIC_KEY);
-      const bricksBuilder = mp.bricks();
-
-      // Ocultar formulario y mostrar wallet
-      form.classList.add('hidden');
-      const walletContainer = document.getElementById('walletContainer');
-      if (walletContainer) {
-        walletContainer.classList.remove('hidden');
-      }
-
-      // Renderizar wallet brick
-      await bricksBuilder.create('wallet', 'wallet_container', {
-        initialization: {
-          preferenceId: data.preferenceId,
-        },
-      });
     } catch (error) {
       console.error('Error:', error);
       setCheckoutError(error instanceof Error ? error.message : 'Error desconocido');
@@ -466,11 +486,16 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 
   // Inicializar
   document.addEventListener('DOMContentLoaded', () => {
-    renderCartSummary();
+    renderCartTotals();
 
     const form = document.getElementById('checkoutForm');
     if (form) {
       form.addEventListener('submit', handleSubmit);
     }
+
+    // Suscribirse a cambios del carrito para actualizar totales
+    cartStore.subscribe(() => {
+      renderCartTotals();
+    });
   });
 </script>

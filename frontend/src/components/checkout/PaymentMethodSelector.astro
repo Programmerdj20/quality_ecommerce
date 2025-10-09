@@ -1,0 +1,175 @@
+---
+/**
+ * PaymentMethodSelector - Selector de método de pago
+ * Permite elegir entre Mercado Pago y Transferencia Bancaria
+ * Siguiendo mejores prácticas de UX con radio buttons y logos
+ */
+---
+
+<div class="bg-white rounded-2xl shadow-md p-6 md:p-8 mb-6">
+  <h2 class="font-heading font-bold text-2xl text-gray-800 mb-4">
+    Método de Pago
+  </h2>
+  <p class="text-gray-600 mb-6">Selecciona cómo deseas pagar tu pedido</p>
+
+  <div class="space-y-3 md:space-y-4">
+    <!-- Mercado Pago -->
+    <label
+      for="payment-mercadopago"
+      class="payment-method-option flex items-start gap-3 md:gap-4 p-3 md:p-4 border-2 border-gray-300 rounded-lg cursor-pointer transition-all hover:border-gray-800 hover:shadow-md"
+      data-payment-method="mercadopago"
+    >
+      <input
+        type="radio"
+        id="payment-mercadopago"
+        name="paymentMethod"
+        value="mercadopago"
+        class="mt-1 w-5 h-5 text-gray-800 border-gray-300 focus:ring-gray-800 flex-shrink-0"
+        checked
+      />
+
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-3 mb-2">
+          <!-- Logo Mercado Pago -->
+          <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 md:w-8 md:h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/>
+            </svg>
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <h3 class="font-bold text-base md:text-lg text-gray-800">Mercado Pago</h3>
+            <p class="text-xs md:text-sm text-gray-600">Tarjetas, PSE y más opciones</p>
+          </div>
+        </div>
+
+        <!-- Badges de Métodos -->
+        <div class="flex flex-wrap gap-1.5 md:gap-2 ml-13 md:ml-16">
+          <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">Tarjetas</span>
+          <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded">PSE</span>
+          <span class="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded">Efectivo</span>
+          <span class="text-xs px-2 py-1 bg-gray-100 text-gray-800 rounded">Cuotas</span>
+        </div>
+
+        <!-- Trust Badge -->
+        <div class="flex items-center gap-2 mt-3 ml-13 md:ml-16 text-xs md:text-sm text-green-700">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+          <span class="font-medium">Pago 100% Seguro</span>
+        </div>
+      </div>
+    </label>
+
+    <!-- Transferencia Bancaria -->
+    <label
+      for="payment-transferencia"
+      class="payment-method-option flex items-start gap-3 md:gap-4 p-3 md:p-4 border-2 border-gray-300 rounded-lg cursor-pointer transition-all hover:border-gray-800 hover:shadow-md"
+      data-payment-method="transferencia"
+    >
+      <input
+        type="radio"
+        id="payment-transferencia"
+        name="paymentMethod"
+        value="transferencia"
+        class="mt-1 w-5 h-5 text-gray-800 border-gray-300 focus:ring-gray-800 flex-shrink-0"
+      />
+
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-3 mb-2">
+          <!-- Logo Bre-B -->
+          <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200">
+            <img src="/images/payment-methods/Logo_breb.webp" alt="Bre-B" class="w-8 h-8 md:w-10 md:h-10 object-contain" />
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <h3 class="font-bold text-base md:text-lg text-gray-800">Transferencia Bancaria</h3>
+            <p class="text-xs md:text-sm text-gray-600">Pago directo con nuestra llave</p>
+          </div>
+        </div>
+
+        <!-- Info de Transferencia (oculta por defecto) -->
+        <div id="transferencia-info" class="hidden ml-13 md:ml-16 mt-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+          <p class="text-sm text-gray-700 mb-2 font-semibold">LLave No:</p>
+          <div class="text-center">
+            <span class="font-mono font-bold text-2xl text-gray-800">98664389</span>
+          </div>
+          <div class="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+            <strong>Importante:</strong> Una vez realizada la transferencia, envía el comprobante a nuestro Whatsapp para la confirmación del pedido.
+          </div>
+        </div>
+
+        <!-- Trust Badge -->
+        <div class="flex items-center gap-2 mt-3 ml-13 md:ml-16 text-xs md:text-sm text-gray-600">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>Confirmación inmediata</span>
+        </div>
+      </div>
+    </label>
+  </div>
+</div>
+
+<script>
+  // Manejar selección de método de pago
+  const paymentOptions = document.querySelectorAll('.payment-method-option');
+  const transferenciaInfo = document.getElementById('transferencia-info');
+  const radioButtons = document.querySelectorAll('input[name="paymentMethod"]');
+
+  // Función para actualizar UI según selección
+  function updatePaymentSelection(selectedMethod: string) {
+    // Actualizar estilos de las opciones
+    paymentOptions.forEach(option => {
+      const method = (option as HTMLElement).dataset.paymentMethod;
+      if (method === selectedMethod) {
+        option.classList.add('border-gray-800', 'bg-gray-50', 'shadow-md');
+        option.classList.remove('border-gray-300');
+      } else {
+        option.classList.remove('border-gray-800', 'bg-gray-50', 'shadow-md');
+        option.classList.add('border-gray-300');
+      }
+    });
+
+    // Mostrar/ocultar info de transferencia
+    if (selectedMethod === 'transferencia') {
+      transferenciaInfo?.classList.remove('hidden');
+    } else {
+      transferenciaInfo?.classList.add('hidden');
+    }
+
+    // Emitir evento personalizado para que checkout.astro lo escuche
+    document.dispatchEvent(new CustomEvent('paymentMethodChanged', {
+      detail: { method: selectedMethod }
+    }));
+  }
+
+  // Event listeners para los radio buttons
+  radioButtons.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const target = e.target as HTMLInputElement;
+      updatePaymentSelection(target.value);
+    });
+  });
+
+  // Event listeners para hacer clic en todo el área
+  paymentOptions.forEach(option => {
+    option.addEventListener('click', (e) => {
+      const method = (option as HTMLElement).dataset.paymentMethod;
+      const radio = document.getElementById(`payment-${method}`) as HTMLInputElement;
+      if (radio && e.target !== radio) {
+        radio.checked = true;
+        updatePaymentSelection(method!);
+      }
+    });
+  });
+
+  // Inicializar con la opción seleccionada por defecto (mercadopago)
+  updatePaymentSelection('mercadopago');
+
+  // Exponer función global para obtener método seleccionado
+  (window as any).getSelectedPaymentMethod = () => {
+    const selected = document.querySelector('input[name="paymentMethod"]:checked') as HTMLInputElement;
+    return selected?.value || 'mercadopago';
+  };
+</script>

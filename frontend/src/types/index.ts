@@ -30,6 +30,7 @@ export type {
   Cart,
   OrderStatus,
   PaymentStatus,
+  PaymentMethod,
   DireccionEnvio,
   ClienteInfo,
   PagoInfo,

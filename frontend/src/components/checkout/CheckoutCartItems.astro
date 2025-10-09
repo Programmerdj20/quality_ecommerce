@@ -1,0 +1,202 @@
+---
+/**
+ * CheckoutCartItems - Lista de productos del carrito en checkout
+ * Muestra productos con controles de cantidad, eliminar y se actualiza en tiempo real
+ * Sticky para mantener visible mientras se hace scroll
+ */
+---
+
+<div class="bg-white rounded-2xl shadow-md p-6 lg:sticky lg:top-24 mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="font-heading font-bold text-xl text-gray-800">
+      Productos en tu Carrito
+    </h2>
+    <span id="cart-item-count" class="text-sm text-gray-600 font-semibold">
+      0 productos
+    </span>
+  </div>
+
+  <!-- Lista de Productos -->
+  <div id="checkout-cart-items" class="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+    <!-- Se llenará dinámicamente con JavaScript -->
+  </div>
+
+  <!-- Empty State -->
+  <div id="checkout-cart-empty" class="hidden text-center py-8">
+    <svg class="w-16 h-16 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+    </svg>
+    <p class="text-gray-600 mb-4">Tu carrito está vacío</p>
+    <a
+      href="/"
+      class="inline-block px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-black transition-colors"
+    >
+      Ir a Comprar
+    </a>
+  </div>
+</div>
+
+<script>
+  import { cartStore, removeFromCart, incrementQuantity, decrementQuantity, formatPrice } from '@/stores/cartStore';
+  import { toastSuccess, toastInfo, toastWarning } from '@/stores/toastStore';
+  import type { Cart } from '@/types';
+
+  const itemsContainer = document.getElementById('checkout-cart-items');
+  const emptyState = document.getElementById('checkout-cart-empty');
+  const itemCount = document.getElementById('cart-item-count');
+
+  // Renderizar productos del carrito
+  function renderCheckoutCartItems(cart: Cart) {
+    if (!itemsContainer || !emptyState || !itemCount) return;
+
+    // Actualizar contador
+    const count = cart.items.length;
+    itemCount.textContent = count === 1 ? '1 producto' : `${count} productos`;
+
+    if (cart.items.length === 0) {
+      itemsContainer.innerHTML = '';
+      itemsContainer.classList.add('hidden');
+      emptyState.classList.remove('hidden');
+    } else {
+      emptyState.classList.add('hidden');
+      itemsContainer.classList.remove('hidden');
+
+      itemsContainer.innerHTML = cart.items.map(item => `
+        <div class="flex gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors" data-product-id="${item.productId}">
+          <!-- Imagen -->
+          <div class="flex-shrink-0">
+            <img src="${item.imagen}" alt="${item.nombre}" class="w-16 h-16 object-cover rounded-md" />
+          </div>
+
+          <!-- Info y Controles -->
+          <div class="flex-1 min-w-0">
+            <h4 class="font-semibold text-sm text-gray-800 line-clamp-2 mb-1">${item.nombre}</h4>
+            <p class="text-xs text-gray-600 mb-2">SKU: ${item.sku}</p>
+
+            <!-- Controles de Cantidad y Precio -->
+            <div class="flex items-center justify-between gap-2">
+              <!-- Botones de Cantidad -->
+              <div class="flex items-center gap-1 bg-white rounded-md border border-gray-300 p-1">
+                <button
+                  class="checkout-decrement-btn w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded transition-colors"
+                  data-product-id="${item.productId}"
+                  aria-label="Disminuir cantidad"
+                >
+                  <svg class="w-3 h-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                  </svg>
+                </button>
+
+                <span class="checkout-item-quantity w-8 text-center text-sm font-semibold">${item.cantidad}</span>
+
+                <button
+                  class="checkout-increment-btn w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded transition-colors"
+                  data-product-id="${item.productId}"
+                  data-stock="${item.stockDisponible}"
+                  aria-label="Aumentar cantidad"
+                >
+                  <svg class="w-3 h-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Precio -->
+              <div class="text-sm font-bold text-gray-800">
+                ${formatPrice(item.precio * item.cantidad)}
+              </div>
+            </div>
+
+            <!-- Stock Warning -->
+            ${item.cantidad >= item.stockDisponible ? '<p class="text-xs text-orange-600 mt-1">Stock máximo alcanzado</p>' : ''}
+          </div>
+
+          <!-- Botón Eliminar -->
+          <div class="flex-shrink-0">
+            <button
+              class="checkout-remove-btn text-gray-400 hover:text-red-600 transition-colors p-1"
+              data-product-id="${item.productId}"
+              aria-label="Eliminar producto"
+            >
+              <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Delegación de eventos para los botones
+  itemsContainer?.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+
+    // Botón de incrementar
+    const incrementBtn = target.closest('.checkout-increment-btn');
+    if (incrementBtn) {
+      e.preventDefault();
+      const productId = (incrementBtn as HTMLElement).dataset.productId;
+      const stock = parseInt((incrementBtn as HTMLElement).dataset.stock || '0');
+
+      if (productId) {
+        const cart = cartStore.get();
+        const item = cart.items.find(i => i.productId === productId);
+
+        if (item && item.cantidad >= stock) {
+          toastWarning('Has alcanzado el stock máximo disponible');
+        } else {
+          incrementQuantity(productId);
+        }
+      }
+      return;
+    }
+
+    // Botón de decrementar
+    const decrementBtn = target.closest('.checkout-decrement-btn');
+    if (decrementBtn) {
+      e.preventDefault();
+      const productId = (decrementBtn as HTMLElement).dataset.productId;
+
+      if (productId) {
+        const cart = cartStore.get();
+        const item = cart.items.find(i => i.productId === productId);
+
+        if (item && item.cantidad === 1) {
+          toastInfo('Producto eliminado del carrito');
+        }
+
+        decrementQuantity(productId);
+      }
+      return;
+    }
+
+    // Botón de eliminar
+    const removeBtn = target.closest('.checkout-remove-btn');
+    if (removeBtn) {
+      e.preventDefault();
+      const productId = (removeBtn as HTMLElement).dataset.productId;
+
+      if (productId) {
+        const cart = cartStore.get();
+        const item = cart.items.find(i => i.productId === productId);
+
+        if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+          removeFromCart(productId);
+          if (item) {
+            toastSuccess(`${item.nombre} eliminado del carrito`);
+          }
+        }
+      }
+      return;
+    }
+  });
+
+  // Suscribirse a cambios en el carrito
+  cartStore.subscribe((cart) => {
+    renderCheckoutCartItems(cart);
+  });
+
+  // Renderizar inicial
+  renderCheckoutCartItems(cartStore.get());
+</script>
