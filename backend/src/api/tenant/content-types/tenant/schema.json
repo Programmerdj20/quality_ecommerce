@@ -1,0 +1,64 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tenants",
+  "info": {
+    "singularName": "tenant",
+    "pluralName": "tenants",
+    "displayName": "Tenant",
+    "description": "Clientes del e-commerce (multi-tenant)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "nombre",
+      "required": true
+    },
+    "dominio": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "qualityApiToken": {
+      "type": "string",
+      "private": true,
+      "required": true
+    },
+    "mercadoPagoAccessToken": {
+      "type": "string",
+      "private": true
+    },
+    "mercadoPagoPublicKey": {
+      "type": "string",
+      "private": true
+    },
+    "configuracion": {
+      "type": "json"
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "planActual": {
+      "type": "enumeration",
+      "enum": ["free", "basic", "premium"],
+      "default": "free"
+    },
+    "fechaCreacion": {
+      "type": "datetime"
+    },
+    "notas": {
+      "type": "text"
+    }
+  }
+}

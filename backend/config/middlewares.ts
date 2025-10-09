@@ -39,4 +39,9 @@ export default [
   'strapi::session',
   'strapi::favicon',
   'strapi::public',
+  // Multi-tenant middleware - resolve tenant by domain
+  {
+    name: 'global::tenant-resolver',
+    config: {},
+  },
 ];

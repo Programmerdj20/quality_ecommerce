@@ -12,6 +12,12 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "tenant": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::tenant.tenant",
+      "required": true
+    },
     "nombre": {
       "type": "string",
       "required": true,
