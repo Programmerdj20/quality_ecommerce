@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_shared_textos_legales",
+  "info": {
+    "displayName": "TextosLegales",
+    "description": "Textos legales y políticas del sitio"
+  },
+  "options": {},
+  "attributes": {
+    "terminos": {
+      "type": "text",
+      "required": true
+    },
+    "privacidad": {
+      "type": "text",
+      "required": true
+    },
+    "sobreNosotros": {
+      "type": "text",
+      "required": true
+    },
+    "politicaEnvios": {
+      "type": "text"
+    },
+    "politicaDevoluciones": {
+      "type": "text"
+    }
+  }
+}

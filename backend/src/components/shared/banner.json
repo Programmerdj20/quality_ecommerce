@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_shared_banners",
+  "info": {
+    "displayName": "Banner",
+    "description": "Banner del carrusel principal"
+  },
+  "options": {},
+  "attributes": {
+    "imagen": {
+      "type": "string",
+      "required": true
+    },
+    "orden": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

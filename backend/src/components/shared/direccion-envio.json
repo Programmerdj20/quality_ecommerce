@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_shared_direccion_envios",
+  "info": {
+    "displayName": "DireccionEnvio",
+    "description": "Dirección de envío del cliente"
+  },
+  "options": {},
+  "attributes": {
+    "calle": {
+      "type": "string",
+      "required": true
+    },
+    "ciudad": {
+      "type": "string",
+      "required": true
+    },
+    "departamento": {
+      "type": "string",
+      "required": true
+    },
+    "codigoPostal": {
+      "type": "string"
+    },
+    "referencias": {
+      "type": "text"
+    }
+  }
+}

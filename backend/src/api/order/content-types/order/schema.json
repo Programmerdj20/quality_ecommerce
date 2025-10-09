@@ -1,0 +1,76 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Order",
+    "description": "Pedidos del e-commerce"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "numero": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "fecha": {
+      "type": "datetime",
+      "required": true
+    },
+    "items": {
+      "type": "json",
+      "required": true
+    },
+    "subtotal": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "iva": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "envio": {
+      "type": "decimal",
+      "default": 0,
+      "min": 0
+    },
+    "total": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "estado": {
+      "type": "enumeration",
+      "enum": ["pendiente", "pagado", "procesando", "enviado", "completado", "cancelado"],
+      "default": "pendiente",
+      "required": true
+    },
+    "cliente": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.cliente-info",
+      "required": true
+    },
+    "pago": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.pago-info",
+      "required": true
+    },
+    "userId": {
+      "type": "string"
+    },
+    "notas": {
+      "type": "text"
+    },
+    "trackingNumber": {
+      "type": "string"
+    }
+  }
+}
