@@ -126,11 +126,13 @@ const externalReference = url.searchParams.get('external_reference');
 </BaseLayout>
 
 <script>
+  import { clearCart } from '@/stores/cartStore';
   import { resetCheckoutState } from '@/stores/orderStore';
 
-  // Resetear estado del checkout cuando se carga la página
+  // Limpiar carrito y resetear estado del checkout cuando se carga la página
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
+      clearCart();
       resetCheckoutState();
     }, 1000);
   });

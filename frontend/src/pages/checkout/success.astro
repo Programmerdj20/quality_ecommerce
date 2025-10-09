@@ -116,10 +116,8 @@ const externalReference = url.searchParams.get('external_reference');
 
   // Limpiar carrito y estado del checkout cuando se carga la página
   document.addEventListener('DOMContentLoaded', () => {
-    // Esperar un poco para asegurar que la página se renderizó
-    setTimeout(() => {
-      clearCart();
-      resetCheckoutState();
-    }, 1000);
+    // Limpiar carrito inmediatamente
+    clearCart();
+    resetCheckoutState();
   });
 </script>

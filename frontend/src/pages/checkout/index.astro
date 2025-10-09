@@ -309,7 +309,7 @@ import PaymentMethodSelector from '@/components/checkout/PaymentMethodSelector.a
 </BaseLayout>
 
 <script>
-  import { cartStore } from '@/stores/cartStore';
+  import { cartStore, clearCart } from '@/stores/cartStore';
   import {
     setCheckoutCustomerInfo,
     setCurrentPreferenceId,
@@ -425,6 +425,9 @@ import PaymentMethodSelector from '@/components/checkout/PaymentMethodSelector.a
         // y redirigir a una página de confirmación con instrucciones
 
         alert(`Pedido creado exitosamente!\n\nReferencia: ${orderReference}\n\nRealiza la transferencia a la cuenta:\nLlave: 98664389\n\nEnvía el comprobante al correo que recibirás por email.`);
+
+        // Limpiar carrito antes de redirigir
+        clearCart();
 
         // Redirigir a página de confirmación (pending)
         window.location.href = '/checkout/pending';
