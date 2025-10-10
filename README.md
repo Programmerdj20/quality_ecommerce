@@ -1,22 +1,91 @@
-# Quality E-commerce - Plataforma E-commerce Colombia
+# Quality E-commerce - Plataforma Multi-Tenant SaaS
 
-Plataforma e-commerce completa para el mercado colombiano, construida con Astro.js, Strapi CMS, y Mercado Pago.
+**Plataforma e-commerce multi-tenant para servir 400+ tiendas online con una sola infraestructura**
+
+Arquitectura SaaS construida con Astro.js, Strapi CMS multi-tenant, y Mercado Pago.
+
+---
+
+## 🏢 Arquitectura Multi-Tenant
+
+Quality Ecommerce es una **plataforma SaaS multi-tenant** que permite servir cientos de tiendas online independientes desde una sola infraestructura compartida.
+
+### ¿Qué es Multi-Tenant?
+
+Cada **tenant** (cliente) tiene su propia tienda online con:
+- ✅ **Dominio propio** (ej: `cliente1.com`, `tienda-x.miapp.com`)
+- ✅ **Branding personalizado** (logo, colores, temas)
+- ✅ **Datos completamente aislados** (órdenes, configuración)
+- ✅ **Tokens propios** (Quality API, Mercado Pago)
+- ✅ **IVA y moneda configurables** por región
+
+### Arquitectura de Alto Nivel
+
+```
+┌──────────────────────────────────────────────────┐
+│  Usuarios → cliente1.com, cliente2.com, ...      │
+└─────────────────┬────────────────────────────────┘
+                  │
+                  ▼
+┌──────────────────────────────────────────────────┐
+│  CLOUDFLARE PAGES (Frontend Multi-Tenant)        │
+│  • Detecta tenant por hostname                   │
+│  • Carga configuración del tenant                │
+│  • Aplica branding dinámico                      │
+└─────────────────┬────────────────────────────────┘
+                  │
+                  ▼
+┌──────────────────────────────────────────────────┐
+│  STRAPI BACKEND (Railway Multi-Tenant)           │
+│  • Row-level isolation por tenant_id             │
+│  • Middleware: tenant-resolver                   │
+│  • Policy: tenant-isolation                      │
+│  • PostgreSQL compartido                         │
+└──────────────────────────────────────────────────┘
+```
+
+### Beneficios
+
+| Sin Multi-Tenant | Con Multi-Tenant |
+|------------------|------------------|
+| 400 instancias separadas | 1 instancia compartida |
+| $2000/mes de infraestructura | $75/mes de infraestructura |
+| 400 deploys por cambio | 1 deploy para todos |
+| Mantenimiento complejo | Mantenimiento centralizado |
+
+**Costo por tenant**: $0.08 - $0.50/mes (vs $5/mes con infraestructura dedicada)
+
+---
 
 ## 🚀 Características Principales
 
-- ✅ **Astro.js 4.x** con output híbrido (SSG + SSR)
+### Core Features
+- ✅ **Multi-Tenant SaaS** con aislamiento completo de datos
+- ✅ **White-Label** completo (cada cliente con su branding)
+- ✅ **Multi-Dominio** (subdominios + custom domains)
+- ✅ **Tokens dinámicos** (Quality API + Mercado Pago por tenant)
+- ✅ **Configuración regional** (IVA, moneda, país por tenant)
+
+### Frontend
+- ✅ **Astro.js 4.x** con SSR híbrido
 - ✅ **Tailwind CSS 4.x** con variables CSS dinámicas
-- ✅ **Sistema de temas dinámicos** (Default, Black Friday, Navidad)
-- ✅ **Integración con API contable externa** para productos e inventario
-- ✅ **Strapi CMS** para configuración del sitio, pedidos y usuarios
-- ✅ **Mercado Pago** para pagos en Colombia (COP)
-- ✅ **SEO optimizado** (Schema.org, sitemap dinámico, meta tags)
+- ✅ **Sistema de temas dinámicos** por tenant
+- ✅ **Detección automática de tenant** por hostname
 - ✅ **TypeScript strict** en todo el proyecto
-- ✅ **Sistema de caché inteligente** para reducir llamadas a APIs
 - ✅ **Carrito de compras** con Nanostores y persistencia
-- ✅ **Guest checkout** y opción de crear cuenta
-- ✅ **Dashboard de usuario** para historial de pedidos
 - ✅ **Responsive y optimizado** para móviles
+
+### Backend
+- ✅ **Strapi 5.x Multi-Tenant** con aislamiento por policies
+- ✅ **PostgreSQL** con row-level isolation
+- ✅ **Middleware tenant-resolver** para detección
+- ✅ **Policy tenant-isolation** para filtrado automático
+- ✅ **API REST** con autenticación JWT
+
+### Integraciones
+- ✅ **Quality API** (backend contable existente) con tokens dinámicos
+- ✅ **Mercado Pago Multi-Tenant** con tokens por cliente
+- ✅ **Cloudflare CDN** global con SSL automático
 
 ## 📁 Estructura del Proyecto
 
@@ -72,10 +141,11 @@ quality_ecommerce/
 - **PostgreSQL** - Base de datos (producción en Heroku)
 - **Node.js** - Runtime
 
-### Infraestructura
-- **Heroku** - Backend y base de datos
-- **Vercel/Netlify** - Frontend estático
-- **Mercado Pago** - Pasarela de pagos (Colombia)
+### Infraestructura Multi-Tenant
+- **Cloudflare Pages** - Frontend Astro (gratis, ilimitado)
+- **Railway** - Backend Strapi + PostgreSQL ($5-75/mes)
+- **Cloudflare DNS** - Multi-dominio con SSL automático
+- **Mercado Pago** - Pasarela de pagos (tokens dinámicos por tenant)
 
 ## 📦 Instalación
 
@@ -224,27 +294,57 @@ const products = await cache.getOrSet(
 - `LONG`: 10 minutos
 - `VERY_LONG`: 1 hora
 
-## 🚀 Despliegue
+## 🚀 Despliegue Multi-Tenant
 
-### Frontend (Vercel)
+### Guías Completas
+
+Hemos creado guías paso a paso para el deployment de la arquitectura multi-tenant:
+
+- 📖 **[Deployment en Railway (Backend)](/docs/DEPLOYMENT_RAILWAY.md)** - Strapi + PostgreSQL
+- 📖 **[Deployment en Cloudflare Pages (Frontend)](/docs/DEPLOYMENT_CLOUDFLARE.md)** - Astro SSR
+- 📖 **[Configuración Multi-Dominio](/docs/DOMAIN_SETUP.md)** - DNS y SSL para múltiples clientes
+- 📖 **[Onboarding de Clientes](/docs/CLIENT_ONBOARDING.md)** - Proceso completo de agregar un nuevo cliente
+
+### Quick Start - Deployment
+
+#### 1. Backend (Railway)
 ```bash
-cd frontend
-pnpm build
-# Conecta con Vercel y despliega
+# Sigue la guía completa en /docs/DEPLOYMENT_RAILWAY.md
+
+1. Crear proyecto en Railway
+2. Conectar GitHub repo
+3. Agregar PostgreSQL addon
+4. Configurar variables de entorno (APP_KEYS, JWT_SECRET, etc.)
+5. Deploy automático ✓
 ```
 
-### Backend (Heroku)
+#### 2. Frontend (Cloudflare Pages)
 ```bash
-cd backend
-# Conecta PostgreSQL addon
-heroku addons:create heroku-postgresql:mini
-# Configura variables de entorno
-heroku config:set NODE_ENV=production
-# Despliega
-git push heroku main
+# Sigue la guía completa en /docs/DEPLOYMENT_CLOUDFLARE.md
+
+1. Crear proyecto en Cloudflare Pages
+2. Conectar GitHub repo
+3. Configurar build: pnpm build (output: dist)
+4. Configurar variables de entorno (PUBLIC_STRAPI_URL, etc.)
+5. Deploy automático ✓
 ```
 
-Ver `docs/DEPLOYMENT.md` para instrucciones detalladas.
+#### 3. Multi-Dominio
+```bash
+# Sigue la guía completa en /docs/DOMAIN_SETUP.md
+
+1. Configurar wildcard DNS: *.miapp.com → cloudflare pages
+2. Agregar dominios custom de clientes
+3. SSL automático por Cloudflare
+```
+
+### Costos de Infraestructura
+
+| Tenants | Infraestructura | Costo/mes | Por Tenant |
+|---------|-----------------|-----------|------------|
+| 1-10 | Railway Starter + Cloudflare Free | $5 | $0.50 |
+| 10-100 | Railway Developer + Cloudflare Free | $20 | $0.20 |
+| 100-400 | Railway Team + Cloudflare Free | $75 | $0.18 |
 
 ## 📝 Scripts Disponibles
 
@@ -296,6 +396,24 @@ Este es un proyecto privado. Para contribuir:
 ## 📄 Licencia
 
 Propietario - Todos los derechos reservados
+
+## 📚 Documentación Completa
+
+### Deployment y Configuración
+- 📖 [Deployment en Railway (Backend)](/docs/DEPLOYMENT_RAILWAY.md)
+- 📖 [Deployment en Cloudflare Pages (Frontend)](/docs/DEPLOYMENT_CLOUDFLARE.md)
+- 📖 [Configuración Multi-Dominio](/docs/DOMAIN_SETUP.md)
+- 📖 [Onboarding de Clientes](/docs/CLIENT_ONBOARDING.md)
+
+### Arquitectura y API
+- 📖 [Arquitectura Multi-Tenant (Detallada)](/docs/MULTI_TENANT_ARCHITECTURE.md)
+- 📖 [API Reference](/docs/API_REFERENCE.md)
+- 📖 [Testing Multi-Tenant](/docs/TESTING_MULTI_TENANT.md)
+
+### Progreso del Proyecto
+- 📊 [Implementation Progress](/IMPLEMENTATION_PROGRESS.md) - Roadmap y estado actual
+
+---
 
 ## 📞 Contacto
 
