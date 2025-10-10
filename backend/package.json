@@ -7,7 +7,12 @@
     "develop": "strapi develop",
     "start": "strapi start",
     "build": "strapi build",
-    "strapi": "strapi"
+    "strapi": "strapi",
+    "seed": "node database/seeds/index.js",
+    "seed:tenants": "node database/seeds/01-tenants-seed.js",
+    "seed:themes": "node database/seeds/02-themes-seed.js",
+    "seed:site-config": "node database/seeds/03-site-config-seed.js",
+    "seed:orders": "node database/seeds/04-orders-seed.js"
   },
   "dependencies": {
     "@strapi/strapi": "^5.27.0",
