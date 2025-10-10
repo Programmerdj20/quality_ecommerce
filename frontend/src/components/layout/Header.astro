@@ -2,7 +2,32 @@
 /**
  * Header - Navbar Minimalista con diseño premium
  * Layout: [Logo] --- [Búsqueda Centro] --- [Ingresar/Registrarse | Carrito]
+ * Con branding dinámico por tenant
  */
+
+import type { TenantContext } from '@/types';
+import { getTenantLogo, getTenantDisplayName } from '@/types';
+
+interface Props {
+  tenant: TenantContext;
+}
+
+const { tenant } = Astro.props;
+
+// Obtener logo y nombre del tenant
+const tenantLogo = getTenantLogo(tenant);
+const tenantName = getTenantDisplayName(tenant);
+
+// Obtener iniciales para logo alternativo
+const initials = tenantName
+  .split(' ')
+  .map(word => word[0])
+  .join('')
+  .toUpperCase()
+  .slice(0, 2);
+
+// Colores del branding del tenant (si existen)
+const primaryColor = tenant.configuracion?.colores?.primary || '#000000';
 ---
 
 <header class="sticky top-0 z-50 bg-white border-b border-gray-300 shadow-sm">
@@ -32,25 +57,31 @@
           </svg>
         </button>
 
-        <!-- Logo (flexible: cuadrado o horizontal) -->
+        <!-- Logo del Tenant (dinámico) -->
         <a href="/" class="flex items-center group">
-          <!-- Logo Cuadrado (ejemplo con iniciales) -->
-          <div class="w-10 h-10 bg-black rounded-lg flex items-center justify-center text-white font-bold text-lg group-hover:bg-gray-800 transition-colors">
-            QE
-          </div>
+          {tenantLogo ? (
+            <!-- Logo como imagen -->
+            <img
+              src={tenantLogo}
+              alt={tenantName}
+              class="h-10 w-auto max-w-[200px] object-contain"
+            />
+          ) : (
+            <!-- Logo con iniciales (fallback) -->
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg group-hover:opacity-90 transition-opacity"
+              style={`background-color: ${primaryColor}`}
+            >
+              {initials}
+            </div>
+          )}
 
           <!-- Nombre del sitio (opcional, oculto en mobile) -->
-          <span class="ml-3 font-heading font-semibold text-lg text-gray-800 hidden md:block">
-            Quality <span class="text-black font-bold">Ecommerce</span>
-          </span>
-
-          <!-- Alternativa: Logo horizontal
-          <img
-            src="/logo-horizontal.svg"
-            alt="Quality Ecommerce"
-            class="h-10 w-auto"
-          />
-          -->
+          {!tenantLogo && (
+            <span class="ml-3 font-heading font-semibold text-lg text-gray-800 hidden md:block">
+              {tenantName}
+            </span>
+          )}
         </a>
       </div>
 

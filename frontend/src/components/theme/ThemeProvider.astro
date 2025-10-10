@@ -2,15 +2,23 @@
 /**
  * ThemeProvider - Componente que carga y aplica el tema activo
  * Se incluye en todos los layouts para inyectar CSS Variables y fuentes
+ * Soporta multi-tenant para cargar tema del tenant específico
  */
 
 import { loadSiteConfig, generateCSSVariables, getGoogleFontsUrl } from '@/utils/theme/themeLoader';
+import type { TenantContext } from '@/types';
 
-// Cargar configuración del sitio con tema activo
-const config = await loadSiteConfig();
+interface Props {
+  tenant: TenantContext;
+}
+
+const { tenant } = Astro.props;
+
+// Cargar configuración del sitio con tema activo del tenant
+const config = await loadSiteConfig(tenant.id, tenant.dominio);
 const theme = config.temaActivo;
 
-// Generar CSS Variables
+// Generar CSS Variables del tema del tenant
 const cssVars = generateCSSVariables(theme);
 
 // URL de Google Fonts

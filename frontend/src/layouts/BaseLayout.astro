@@ -2,6 +2,7 @@
 /**
  * BaseLayout - Layout principal del sitio
  * Incluye ThemeProvider, Header, Footer y estilos globales
+ * Con detección automática de tenant por dominio
  */
 
 import ThemeProvider from '@/components/theme/ThemeProvider.astro';
@@ -11,6 +12,9 @@ import MobileMenu from '@/components/layout/MobileMenu.astro';
 import SearchModal from '@/components/search/SearchModal.astro';
 import CartDrawer from '@/components/cart/CartDrawer.astro';
 import ToastContainer from '@/components/toast/ToastContainer.astro';
+import { getTenantByDomain } from '@/utils/tenant/tenantResolver';
+import { tenantToContext, getTenantDisplayName } from '@/types';
+import type { TenantContext } from '@/types';
 import '@/styles/global.css';
 
 interface Props {
@@ -27,8 +31,33 @@ const {
   showFooter = true
 } = Astro.props;
 
-const siteName = 'Quality Ecommerce';
+// ============================================
+// DETECCIÓN DE TENANT
+// ============================================
+const domain = new URL(Astro.request.url).host;
+console.log(`🔍 Detectando tenant para dominio: ${domain}`);
+
+const tenant = await getTenantByDomain(domain);
+
+// Si no se encuentra tenant, mostrar error 404
+if (!tenant) {
+  console.error(`❌ No se encontró tenant para dominio: ${domain}`);
+  return Astro.redirect('/404');
+}
+
+// Convertir a TenantContext (sin tokens privados)
+const tenantContext: TenantContext = tenantToContext(tenant);
+
+console.log(`✅ Tenant detectado: ${tenantContext.nombre} (ID: ${tenantContext.id})`);
+
+// ============================================
+// CONFIGURACIÓN DEL SITIO
+// ============================================
+const siteName = getTenantDisplayName(tenantContext);
 const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+
+// Hacer tenant disponible globalmente para otros componentes
+// Se pasa como prop a los componentes que lo necesiten
 ---
 
 <!DOCTYPE html>
@@ -42,27 +71,32 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- Theme Provider (carga fuentes y CSS variables) -->
-    <ThemeProvider />
+    <!-- Theme Provider (carga fuentes y CSS variables del tenant) -->
+    <ThemeProvider tenant={tenantContext} />
 
     <!-- Title -->
     <title>{fullTitle}</title>
 
     <!-- Slot para meta tags adicionales desde páginas -->
     <slot name="head" />
+
+    <!-- Pasar tenant al cliente via script global (sin tokens privados) -->
+    <script is:inline define:vars={{ tenant: tenantContext }}>
+      window.__TENANT__ = tenant;
+    </script>
   </head>
 
   <body class="min-h-screen flex flex-col bg-background text-text">
-    <!-- Header -->
-    {showHeader && <Header />}
+    <!-- Header (con tenant para logo y branding) -->
+    {showHeader && <Header tenant={tenantContext} />}
 
     <!-- Main Content -->
     <main class="flex-grow">
       <slot />
     </main>
 
-    <!-- Footer -->
-    {showFooter && <Footer />}
+    <!-- Footer (con tenant para textos legales) -->
+    {showFooter && <Footer tenant={tenantContext} />}
 
     <!-- Mobile Menu Drawer (global) -->
     <MobileMenu />

@@ -2,6 +2,7 @@
  * API Route: Mercado Pago Webhook
  *
  * Recibe notificaciones de Mercado Pago cuando cambia el estado de un pago
+ * Soporta multi-tenant identificando el tenant desde metadata
  *
  * POST /api/webhooks/mercadopago
  *
@@ -13,16 +14,8 @@
 import type { APIRoute } from 'astro';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
 import type { MercadoPagoWebhook } from '@/types/order';
-
-// Configuración de Mercado Pago
-const client = new MercadoPagoConfig({
-  accessToken: import.meta.env.MP_ACCESS_TOKEN || '',
-  options: {
-    timeout: 5000,
-  },
-});
-
-const payment = new Payment(client);
+import { getTenantById } from '@/utils/tenant/tenantResolver';
+import { updateOrderStatus } from '@/utils/api/strapiApi';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -56,8 +49,84 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Consultar información del pago
-    const paymentInfo = await payment.get({ id: paymentId });
+    // ============================================
+    // MULTI-TENANT: Primero obtener info básica para extraer tenant_id
+    // ============================================
+
+    // Para obtener el tenant, necesitamos primero hacer una consulta preliminar
+    // Usamos un cliente temporal con variables de entorno (fallback)
+    const tempClient = new MercadoPagoConfig({
+      accessToken: import.meta.env.MP_ACCESS_TOKEN || '',
+      options: {
+        timeout: 5000,
+      },
+    });
+
+    const tempPayment = new Payment(tempClient);
+    let paymentInfo;
+
+    try {
+      paymentInfo = await tempPayment.get({ id: paymentId });
+    } catch (error) {
+      // Si falla con el token por defecto, intentaremos con cada tenant
+      console.warn('⚠️ No se pudo obtener pago con token por defecto');
+      throw error;
+    }
+
+    console.log('💳 Información preliminar del pago:', {
+      id: paymentInfo.id,
+      status: paymentInfo.status,
+      external_reference: paymentInfo.external_reference,
+      metadata: paymentInfo.metadata,
+    });
+
+    // Extraer tenant_id de metadata
+    const tenantId = paymentInfo.metadata?.tenant_id;
+
+    if (!tenantId) {
+      console.error('❌ No se encontró tenant_id en metadata del pago');
+      // Retornar 200 para evitar reintentos pero loggear el error
+      return new Response(
+        JSON.stringify({
+          message: 'OK',
+          warning: 'No se encontró tenant_id en metadata',
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // Buscar tenant por ID
+    const tenant = await getTenantById(tenantId);
+
+    if (!tenant || !tenant.mercadoPagoAccessToken) {
+      console.error(`❌ Tenant no encontrado o sin MP: ${tenantId}`);
+      return new Response(
+        JSON.stringify({
+          message: 'OK',
+          warning: 'Tenant no encontrado',
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    console.log(`✅ Tenant identificado: ${tenant.nombre} (ID: ${tenant.id})`);
+
+    // Ahora consultar el pago con el token correcto del tenant
+    const client = new MercadoPagoConfig({
+      accessToken: tenant.mercadoPagoAccessToken,
+      options: {
+        timeout: 5000,
+      },
+    });
+
+    const payment = new Payment(client);
+    paymentInfo = await payment.get({ id: paymentId });
 
     console.log('💳 Información del pago:', {
       id: paymentInfo.id,
@@ -68,32 +137,73 @@ export const POST: APIRoute = async ({ request }) => {
       payer_email: paymentInfo.payer?.email,
     });
 
-    // Aquí puedes procesar el pago según su estado
+    // Procesar el pago según su estado y actualizar order en Strapi
+    const orderReference = paymentInfo.external_reference;
+
     switch (paymentInfo.status) {
       case 'approved':
-        console.log('✅ Pago aprobado:', paymentInfo.id);
-        // TODO: Actualizar pedido en la base de datos (Strapi)
+        console.log(`✅ Pago aprobado: ${paymentInfo.id} para order: ${orderReference}`);
+        // Actualizar pedido en Strapi con el tenant correcto
+        await updateOrderStatus(
+          orderReference || '',
+          'completada',
+          {
+            metodo: 'mercadopago',
+            estado: 'aprobado',
+            transaccionId: paymentInfo.id?.toString(),
+            monto: paymentInfo.transaction_amount,
+            fechaPago: new Date().toISOString(),
+          },
+          tenant.dominio
+        );
         // TODO: Enviar email de confirmación
         // TODO: Actualizar stock de productos
         break;
 
       case 'pending':
       case 'in_process':
-        console.log('⏳ Pago pendiente:', paymentInfo.id);
-        // TODO: Actualizar pedido como pendiente
+        console.log(`⏳ Pago pendiente: ${paymentInfo.id}`);
+        await updateOrderStatus(
+          orderReference || '',
+          'pendiente',
+          {
+            metodo: 'mercadopago',
+            estado: 'pendiente',
+            transaccionId: paymentInfo.id?.toString(),
+          },
+          tenant.dominio
+        );
         break;
 
       case 'rejected':
       case 'cancelled':
-        console.log('❌ Pago rechazado/cancelado:', paymentInfo.id);
-        // TODO: Actualizar pedido como fallido
+        console.log(`❌ Pago rechazado/cancelado: ${paymentInfo.id}`);
+        await updateOrderStatus(
+          orderReference || '',
+          'cancelada',
+          {
+            metodo: 'mercadopago',
+            estado: 'rechazado',
+            transaccionId: paymentInfo.id?.toString(),
+          },
+          tenant.dominio
+        );
         // TODO: Liberar stock reservado
         break;
 
       case 'refunded':
       case 'charged_back':
-        console.log('💸 Pago devuelto:', paymentInfo.id);
-        // TODO: Procesar devolución
+        console.log(`💸 Pago devuelto: ${paymentInfo.id}`);
+        await updateOrderStatus(
+          orderReference || '',
+          'devuelta',
+          {
+            metodo: 'mercadopago',
+            estado: 'devuelto',
+            transaccionId: paymentInfo.id?.toString(),
+          },
+          tenant.dominio
+        );
         // TODO: Restaurar stock
         break;
 

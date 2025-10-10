@@ -3,6 +3,7 @@
  *
  * Crea una preferencia de pago en Mercado Pago con la información
  * del carrito y del cliente
+ * Soporta multi-tenant con tokens dinámicos por tenant
  *
  * POST /api/checkout/create-preference
  */
@@ -10,26 +11,68 @@
 import type { APIRoute } from 'astro';
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import type { CartItem, CheckoutFormData } from '@/types/order';
-
-// Configuración de Mercado Pago
-const client = new MercadoPagoConfig({
-  accessToken: import.meta.env.MP_ACCESS_TOKEN || '',
-  options: {
-    timeout: 5000,
-  },
-});
-
-const preference = new Preference(client);
+import { getTenantByDomain } from '@/utils/tenant/tenantResolver';
+import { getTenantIVA, getTenantCurrency } from '@/types';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Parsear el body
     const body = await request.json();
-    const { items, customerInfo, orderReference } = body as {
+    const { items, customerInfo, orderReference, tenantDomain } = body as {
       items: CartItem[];
       customerInfo: CheckoutFormData;
       orderReference: string;
+      tenantDomain?: string;
     };
+
+    // Obtener dominio del request o del body
+    const domain = tenantDomain || new URL(request.url).host;
+
+    console.log(`🔍 [Mercado Pago] Buscando tenant para dominio: ${domain}`);
+
+    // Buscar tenant para obtener tokens de Mercado Pago
+    const tenant = await getTenantByDomain(domain);
+
+    if (!tenant) {
+      console.error(`❌ [Mercado Pago] Tenant no encontrado: ${domain}`);
+      return new Response(
+        JSON.stringify({
+          error: 'Tenant no encontrado',
+          details: `No se encontró configuración para el dominio: ${domain}`,
+        }),
+        {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // Validar que el tenant tiene Mercado Pago configurado
+    if (!tenant.mercadoPagoAccessToken) {
+      console.error(`❌ [Mercado Pago] Tenant sin MP configurado: ${tenant.nombre}`);
+      return new Response(
+        JSON.stringify({
+          error: 'Mercado Pago no configurado',
+          details: 'Este comercio no tiene Mercado Pago configurado',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    console.log(`✅ [Mercado Pago] Tenant encontrado: ${tenant.nombre}`);
+
+    // Configurar Mercado Pago con el token del tenant
+    const client = new MercadoPagoConfig({
+      accessToken: tenant.mercadoPagoAccessToken,
+      options: {
+        timeout: 5000,
+      },
+    });
+
+    const preference = new Preference(client);
 
     // Validaciones básicas
     if (!items || items.length === 0) {
@@ -56,12 +99,16 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // Obtener URL del sitio
-    const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://localhost:4321';
+    // Obtener URL del sitio (puede ser personalizada por tenant)
+    const siteUrl = import.meta.env.PUBLIC_SITE_URL || `https://${domain}`;
 
-    // Calcular totales
+    // Obtener IVA y moneda del tenant
+    const ivaRate = getTenantIVA(tenant);
+    const currency = getTenantCurrency(tenant);
+
+    // Calcular totales con IVA del tenant
     const subtotal = items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
-    const iva = subtotal * 0.19; // IVA 19% Colombia
+    const iva = subtotal * ivaRate;
     const total = subtotal + iva;
 
     // Construir items para Mercado Pago
@@ -72,18 +119,19 @@ export const POST: APIRoute = async ({ request }) => {
       picture_url: item.imagen.startsWith('http') ? item.imagen : `${siteUrl}${item.imagen}`,
       category_id: 'electronics', // Puedes hacerlo dinámico según categoría
       quantity: item.cantidad,
-      currency_id: 'COP',
+      currency_id: currency,
       unit_price: item.precio,
     }));
 
     // Agregar IVA como un item adicional
+    const ivaPercentage = Math.round(ivaRate * 100);
     mpItems.push({
       id: 'IVA',
-      title: 'IVA (19%)',
+      title: `IVA (${ivaPercentage}%)`,
       description: 'Impuesto al Valor Agregado',
       category_id: 'services',
       quantity: 1,
-      currency_id: 'COP',
+      currency_id: currency,
       unit_price: Number(iva.toFixed(2)),
     });
 
@@ -120,7 +168,7 @@ export const POST: APIRoute = async ({ request }) => {
       };
     }
 
-    // Crear la preferencia
+    // Crear la preferencia con tenant metadata
     const preferenceData = {
       items: mpItems,
       payer,
@@ -132,8 +180,10 @@ export const POST: APIRoute = async ({ request }) => {
       auto_return: 'approved' as const,
       external_reference: orderReference,
       notification_url: `${siteUrl}/api/webhooks/mercadopago`,
-      statement_descriptor: import.meta.env.PUBLIC_SITE_NAME || 'Quality Ecommerce',
+      statement_descriptor: tenant.configuracion?.nombre || tenant.nombre,
       metadata: {
+        tenant_id: tenant.id.toString(),
+        tenant_domain: tenant.dominio,
         customer_email: customerInfo.email,
         customer_name: `${customerInfo.nombre} ${customerInfo.apellido || ''}`.trim(),
         order_reference: orderReference,

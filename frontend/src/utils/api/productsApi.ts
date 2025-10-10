@@ -1,6 +1,7 @@
 /**
- * Cliente para la API contable externa
+ * Cliente para la API contable externa (Quality API)
  * Maneja productos, inventario, precios e imágenes
+ * Soporta multi-tenant con tokens dinámicos
  */
 
 import type { Product, ProductCategory, ProductFilters, ProductListResponse } from '@/types';
@@ -8,30 +9,33 @@ import { PLACEHOLDER_PRODUCTS, PLACEHOLDER_CATEGORIES } from './placeholderData'
 import { cache, CACHE_KEYS, CACHE_TTL } from '@/utils/cache/simpleCache';
 
 const API_URL = import.meta.env.PUBLIC_API_CONTABLE_URL;
-const API_TOKEN = import.meta.env.PUBLIC_API_CONTABLE_TOKEN;
-const USE_PLACEHOLDER = !API_URL || !API_TOKEN;
 
 /**
- * Configuración del cliente HTTP
+ * Opciones para fetch de productos
  */
-const fetchConfig: RequestInit = {
-  headers: {
-    'Authorization': `Bearer ${API_TOKEN}`,
-    'Content-Type': 'application/json',
-  }
-};
+interface ProductsFetchOptions {
+  qualityApiToken?: string; // Token dinámico del tenant
+  tenantId?: string; // Para caché específico del tenant
+}
 
 /**
- * Wrapper para fetch con manejo de errores
+ * Wrapper para fetch con manejo de errores y token dinámico
  */
-async function apiFetch<T>(endpoint: string): Promise<T> {
-  if (USE_PLACEHOLDER) {
-    console.warn(`⚠️ API contable no configurada. Usando datos placeholder.`);
-    throw new Error('API not configured');
+async function apiFetch<T>(endpoint: string, options?: ProductsFetchOptions): Promise<T> {
+  const token = options?.qualityApiToken;
+
+  if (!API_URL || !token) {
+    console.warn(`⚠️ API contable no configurada o token no disponible. Usando datos placeholder.`);
+    throw new Error('API not configured or token missing');
   }
 
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, fetchConfig);
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
@@ -47,16 +51,21 @@ async function apiFetch<T>(endpoint: string): Promise<T> {
 /**
  * Obtener lista de productos con filtros opcionales
  */
-export async function getProducts(filters?: ProductFilters): Promise<Product[]> {
-  const cacheKey = `${CACHE_KEYS.PRODUCTS}:${JSON.stringify(filters || {})}`;
+export async function getProducts(
+  filters?: ProductFilters,
+  options?: ProductsFetchOptions
+): Promise<Product[]> {
+  const cacheKey = options?.tenantId
+    ? `${CACHE_KEYS.PRODUCTS}:${options.tenantId}:${JSON.stringify(filters || {})}`
+    : `${CACHE_KEYS.PRODUCTS}:${JSON.stringify(filters || {})}`;
 
   return cache.getOrSet(
     cacheKey,
     async () => {
       try {
         // TODO: Ajustar según la estructura real de tu API
-        // Ejemplo: const data = await apiFetch<Product[]>('/productos');
-        const data = await apiFetch<Product[]>('/productos');
+        // Ejemplo: const data = await apiFetch<Product[]>('/productos', options);
+        const data = await apiFetch<Product[]>('/productos', options);
 
         // Aplicar filtros localmente si la API no los soporta
         return applyLocalFilters(data, filters);
@@ -72,15 +81,19 @@ export async function getProducts(filters?: ProductFilters): Promise<Product[]> 
 /**
  * Obtener un producto por su slug
  */
-export async function getProductBySlug(slug: string): Promise<Product | null> {
-  const cacheKey = `${CACHE_KEYS.PRODUCT}:${slug}`;
+export async function getProductBySlug(
+  slug: string,
+  options?: ProductsFetchOptions
+): Promise<Product | null> {
+  const cacheKey = options?.tenantId
+    ? `${CACHE_KEYS.PRODUCT}:${options.tenantId}:${slug}`
+    : `${CACHE_KEYS.PRODUCT}:${slug}`;
 
   return cache.getOrSet(
     cacheKey,
     async () => {
       try {
-        // TODO: Ajustar según la estructura real de tu API
-        const data = await apiFetch<Product>(`/productos/${slug}`);
+        const data = await apiFetch<Product>(`/productos/${slug}`, options);
         return data;
       } catch (error) {
         console.warn(`Usando placeholder para producto: ${slug}`);
@@ -94,14 +107,19 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 /**
  * Obtener un producto por su ID
  */
-export async function getProductById(id: string): Promise<Product | null> {
-  const cacheKey = `${CACHE_KEYS.PRODUCT}:id:${id}`;
+export async function getProductById(
+  id: string,
+  options?: ProductsFetchOptions
+): Promise<Product | null> {
+  const cacheKey = options?.tenantId
+    ? `${CACHE_KEYS.PRODUCT}:${options.tenantId}:id:${id}`
+    : `${CACHE_KEYS.PRODUCT}:id:${id}`;
 
   return cache.getOrSet(
     cacheKey,
     async () => {
       try {
-        const data = await apiFetch<Product>(`/productos/id/${id}`);
+        const data = await apiFetch<Product>(`/productos/id/${id}`, options);
         return data;
       } catch (error) {
         console.warn(`Usando placeholder para producto ID: ${id}`);
@@ -115,14 +133,19 @@ export async function getProductById(id: string): Promise<Product | null> {
 /**
  * Obtener productos por categoría
  */
-export async function getProductsByCategory(categorySlug: string): Promise<Product[]> {
-  const cacheKey = `${CACHE_KEYS.PRODUCTS}:category:${categorySlug}`;
+export async function getProductsByCategory(
+  categorySlug: string,
+  options?: ProductsFetchOptions
+): Promise<Product[]> {
+  const cacheKey = options?.tenantId
+    ? `${CACHE_KEYS.PRODUCTS}:${options.tenantId}:category:${categorySlug}`
+    : `${CACHE_KEYS.PRODUCTS}:category:${categorySlug}`;
 
   return cache.getOrSet(
     cacheKey,
     async () => {
       try {
-        const data = await apiFetch<Product[]>(`/productos/categoria/${categorySlug}`);
+        const data = await apiFetch<Product[]>(`/productos/categoria/${categorySlug}`, options);
         return data;
       } catch (error) {
         console.warn(`Usando placeholder para categoría: ${categorySlug}`);
@@ -136,12 +159,16 @@ export async function getProductsByCategory(categorySlug: string): Promise<Produ
 /**
  * Obtener todas las categorías
  */
-export async function getCategories(): Promise<ProductCategory[]> {
+export async function getCategories(options?: ProductsFetchOptions): Promise<ProductCategory[]> {
+  const cacheKey = options?.tenantId
+    ? `${CACHE_KEYS.CATEGORIES}:${options.tenantId}`
+    : CACHE_KEYS.CATEGORIES;
+
   return cache.getOrSet(
-    CACHE_KEYS.CATEGORIES,
+    cacheKey,
     async () => {
       try {
-        const data = await apiFetch<ProductCategory[]>('/categorias');
+        const data = await apiFetch<ProductCategory[]>('/categorias', options);
         return data;
       } catch (error) {
         console.warn('Usando placeholder para categorías');
@@ -155,14 +182,19 @@ export async function getCategories(): Promise<ProductCategory[]> {
 /**
  * Buscar productos por texto
  */
-export async function searchProducts(query: string): Promise<Product[]> {
-  const cacheKey = `${CACHE_KEYS.PRODUCTS}:search:${query.toLowerCase()}`;
+export async function searchProducts(
+  query: string,
+  options?: ProductsFetchOptions
+): Promise<Product[]> {
+  const cacheKey = options?.tenantId
+    ? `${CACHE_KEYS.PRODUCTS}:${options.tenantId}:search:${query.toLowerCase()}`
+    : `${CACHE_KEYS.PRODUCTS}:search:${query.toLowerCase()}`;
 
   return cache.getOrSet(
     cacheKey,
     async () => {
       try {
-        const data = await apiFetch<Product[]>(`/productos/buscar?q=${encodeURIComponent(query)}`);
+        const data = await apiFetch<Product[]>(`/productos/buscar?q=${encodeURIComponent(query)}`, options);
         return data;
       } catch (error) {
         console.warn('Usando búsqueda local en placeholder');
@@ -179,12 +211,20 @@ export async function searchProducts(query: string): Promise<Product[]> {
 /**
  * Verificar disponibilidad de stock para múltiples productos
  */
-export async function checkStockAvailability(productIds: string[]): Promise<Record<string, number>> {
+export async function checkStockAvailability(
+  productIds: string[],
+  options?: ProductsFetchOptions
+): Promise<Record<string, number>> {
   try {
-    const data = await apiFetch<Record<string, number>>('/productos/stock', {
+    // Nota: apiFetch solo acepta endpoint y options, necesitamos adaptar
+    // Para POST requests, necesitamos agregar body a las opciones
+    const fetchOptions: ProductsFetchOptions & RequestInit = {
+      ...options,
       method: 'POST',
       body: JSON.stringify({ productIds })
-    } as RequestInit);
+    };
+
+    const data = await apiFetch<Record<string, number>>('/productos/stock', fetchOptions as ProductsFetchOptions);
     return data;
   } catch (error) {
     console.warn('Usando stock placeholder');
@@ -200,14 +240,19 @@ export async function checkStockAvailability(productIds: string[]): Promise<Reco
 /**
  * Obtener productos destacados o en oferta
  */
-export async function getFeaturedProducts(limit: number = 6): Promise<Product[]> {
-  const cacheKey = `${CACHE_KEYS.PRODUCTS}:featured:${limit}`;
+export async function getFeaturedProducts(
+  limit: number = 6,
+  options?: ProductsFetchOptions
+): Promise<Product[]> {
+  const cacheKey = options?.tenantId
+    ? `${CACHE_KEYS.PRODUCTS}:${options.tenantId}:featured:${limit}`
+    : `${CACHE_KEYS.PRODUCTS}:featured:${limit}`;
 
   return cache.getOrSet(
     cacheKey,
     async () => {
       try {
-        const data = await apiFetch<Product[]>(`/productos/destacados?limit=${limit}`);
+        const data = await apiFetch<Product[]>(`/productos/destacados?limit=${limit}`, options);
         return data;
       } catch (error) {
         console.warn('Usando productos destacados placeholder');

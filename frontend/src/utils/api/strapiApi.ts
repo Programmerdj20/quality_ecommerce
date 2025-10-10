@@ -1,9 +1,10 @@
 /**
  * Cliente para Strapi CMS
  * Maneja configuración del sitio, temas, pedidos y usuarios
+ * Soporta Multi-Tenant con header x-tenant-domain
  */
 
-import type { SiteConfig, Theme, Order, StrapiResponse } from '@/types';
+import type { SiteConfig, Theme, Order, StrapiResponse, Tenant } from '@/types';
 import { PLACEHOLDER_SITE_CONFIG } from './placeholderData';
 import { cache, CACHE_KEYS, CACHE_TTL } from '@/utils/cache/simpleCache';
 
@@ -11,11 +12,18 @@ const STRAPI_URL = import.meta.env.PUBLIC_STRAPI_URL;
 const STRAPI_TOKEN = import.meta.env.STRAPI_API_TOKEN;
 
 /**
- * Wrapper para fetch de Strapi con autenticación
+ * Opciones para fetch de Strapi con soporte multi-tenant
+ */
+interface StrapiFetchOptions extends RequestInit {
+  tenantDomain?: string; // Dominio del tenant para header x-tenant-domain
+}
+
+/**
+ * Wrapper para fetch de Strapi con autenticación y multi-tenant
  */
 async function strapiFetch<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: StrapiFetchOptions = {}
 ): Promise<T> {
   const url = `${STRAPI_URL}/api${endpoint}`;
 
@@ -27,6 +35,11 @@ async function strapiFetch<T>(
   // Agregar token si está disponible
   if (STRAPI_TOKEN) {
     headers['Authorization'] = `Bearer ${STRAPI_TOKEN}`;
+  }
+
+  // Agregar header de tenant si está disponible (para isolation)
+  if (options.tenantDomain) {
+    headers['x-tenant-domain'] = options.tenantDomain;
   }
 
   try {
@@ -47,19 +60,60 @@ async function strapiFetch<T>(
 }
 
 /**
- * Obtener configuración del sitio
+ * Obtener tenant por dominio
+ * Usado por el middleware de detección de tenant
  */
-export async function getSiteConfig(): Promise<SiteConfig> {
+export async function getTenantByDomain(domain: string): Promise<Tenant | null> {
+  try {
+    const normalizedDomain = domain.replace(/^https?:\/\//, '').toLowerCase();
+    const response = await strapiFetch<{ data: any[] }>(
+      `/tenants?filters[dominio][$eq]=${encodeURIComponent(normalizedDomain)}&filters[activo][$eq]=true&populate=*`
+    );
+
+    if (!response.data || response.data.length === 0) {
+      console.warn(`⚠️ No se encontró tenant activo para dominio: ${normalizedDomain}`);
+      return null;
+    }
+
+    const tenantData = response.data[0];
+    const tenant: Tenant = {
+      id: tenantData.id,
+      ...tenantData.attributes,
+    };
+
+    return tenant;
+  } catch (error) {
+    console.error('❌ Error al obtener tenant por dominio:', error);
+    return null;
+  }
+}
+
+/**
+ * Obtener configuración del sitio (filtrada por tenant)
+ */
+export async function getSiteConfig(tenantId?: string, tenantDomain?: string): Promise<SiteConfig> {
+  const cacheKey = tenantId ? `${CACHE_KEYS.SITE_CONFIG}:${tenantId}` : CACHE_KEYS.SITE_CONFIG;
+
   return cache.getOrSet(
-    CACHE_KEYS.SITE_CONFIG,
+    cacheKey,
     async () => {
       try {
+        const queryParams = tenantId ? `?filters[tenant][id][$eq]=${tenantId}&populate=deep` : '?populate=deep';
         const response = await strapiFetch<StrapiResponse<any>>(
-          '/site-configuration?populate=deep'
+          `/site-configs${queryParams}`,
+          { tenantDomain }
         );
 
+        // Si es un array, tomar el primero
+        const data = Array.isArray(response.data) ? response.data[0] : response.data;
+
+        if (!data) {
+          console.warn('⚠️ No se encontró configuración del sitio, usando placeholder');
+          return PLACEHOLDER_SITE_CONFIG;
+        }
+
         // Transformar respuesta de Strapi al formato esperado
-        return transformStrapiConfig(response.data);
+        return transformStrapiConfig(data);
       } catch (error) {
         console.warn('Usando configuración placeholder');
         return PLACEHOLDER_SITE_CONFIG;
@@ -70,14 +124,16 @@ export async function getSiteConfig(): Promise<SiteConfig> {
 }
 
 /**
- * Obtener tema activo
+ * Obtener tema activo del tenant
  */
-export async function getActiveTheme(): Promise<Theme> {
+export async function getActiveTheme(tenantId?: string, tenantDomain?: string): Promise<Theme> {
+  const cacheKey = tenantId ? `${CACHE_KEYS.THEME}:${tenantId}` : CACHE_KEYS.THEME;
+
   return cache.getOrSet(
-    CACHE_KEYS.THEME,
+    cacheKey,
     async () => {
       try {
-        const config = await getSiteConfig();
+        const config = await getSiteConfig(tenantId, tenantDomain);
         return config.temaActivo;
       } catch (error) {
         console.warn('Usando tema placeholder');
@@ -89,12 +145,20 @@ export async function getActiveTheme(): Promise<Theme> {
 }
 
 /**
- * Obtener todos los temas disponibles
+ * Obtener todos los temas disponibles del tenant
  */
-export async function getThemes(): Promise<Theme[]> {
+export async function getThemes(tenantId?: string, tenantDomain?: string): Promise<Theme[]> {
   try {
-    const response = await strapiFetch<StrapiResponse<Theme[]>>('/themes');
-    return response.data;
+    const queryParams = tenantId ? `?filters[tenant][id][$eq]=${tenantId}&populate=*` : '?populate=*';
+    const response = await strapiFetch<{ data: any[] }>(
+      `/themes${queryParams}`,
+      { tenantDomain }
+    );
+
+    return response.data.map((item: any) => ({
+      id: item.id,
+      ...item.attributes,
+    }));
   } catch (error) {
     console.error('Error obteniendo temas:', error);
     return [];
@@ -127,16 +191,30 @@ export async function setActiveTheme(themeId: string): Promise<boolean> {
 }
 
 /**
- * Crear un nuevo pedido
+ * Crear un nuevo pedido (con tenant)
  */
-export async function createOrder(orderData: Partial<Order>): Promise<Order | null> {
+export async function createOrder(
+  orderData: Partial<Order>,
+  tenantId: string | number,
+  tenantDomain?: string
+): Promise<Order | null> {
   try {
-    const response = await strapiFetch<StrapiResponse<Order>>('/orders', {
+    // Agregar tenantId a los datos del pedido
+    const orderWithTenant = {
+      ...orderData,
+      tenant: tenantId,
+    };
+
+    const response = await strapiFetch<{ data: any }>('/orders', {
       method: 'POST',
-      body: JSON.stringify({ data: orderData })
+      body: JSON.stringify({ data: orderWithTenant }),
+      tenantDomain,
     });
 
-    return response.data;
+    return {
+      id: response.data.id,
+      ...response.data.attributes,
+    };
   } catch (error) {
     console.error('Error creando pedido:', error);
     return null;
@@ -149,7 +227,8 @@ export async function createOrder(orderData: Partial<Order>): Promise<Order | nu
 export async function updateOrderStatus(
   orderId: string,
   status: Order['estado'],
-  paymentData?: Partial<Order['pago']>
+  paymentData?: Partial<Order['pago']>,
+  tenantDomain?: string
 ): Promise<boolean> {
   try {
     const updateData: any = { estado: status };
@@ -160,7 +239,8 @@ export async function updateOrderStatus(
 
     await strapiFetch(`/orders/${orderId}`, {
       method: 'PUT',
-      body: JSON.stringify({ data: updateData })
+      body: JSON.stringify({ data: updateData }),
+      tenantDomain,
     });
 
     return true;
@@ -171,15 +251,19 @@ export async function updateOrderStatus(
 }
 
 /**
- * Obtener pedidos de un usuario
+ * Obtener pedidos de un usuario (filtrado por tenant automáticamente)
  */
-export async function getUserOrders(userId: string): Promise<Order[]> {
+export async function getUserOrders(userId: string, tenantDomain?: string): Promise<Order[]> {
   try {
-    const response = await strapiFetch<StrapiResponse<Order[]>>(
-      `/orders?filters[user][id][$eq]=${userId}&sort=createdAt:desc`
+    const response = await strapiFetch<{ data: any[] }>(
+      `/orders?filters[user][id][$eq]=${userId}&sort=createdAt:desc`,
+      { tenantDomain }
     );
 
-    return response.data;
+    return response.data.map((item: any) => ({
+      id: item.id,
+      ...item.attributes,
+    }));
   } catch (error) {
     console.error('Error obteniendo pedidos:', error);
     return [];
@@ -187,15 +271,22 @@ export async function getUserOrders(userId: string): Promise<Order[]> {
 }
 
 /**
- * Obtener un pedido por número
+ * Obtener un pedido por número (filtrado por tenant automáticamente)
  */
-export async function getOrderByNumber(orderNumber: string): Promise<Order | null> {
+export async function getOrderByNumber(orderNumber: string, tenantDomain?: string): Promise<Order | null> {
   try {
-    const response = await strapiFetch<StrapiResponse<Order[]>>(
-      `/orders?filters[numero][$eq]=${orderNumber}`
+    const response = await strapiFetch<{ data: any[] }>(
+      `/orders?filters[numero][$eq]=${orderNumber}`,
+      { tenantDomain }
     );
 
-    return response.data[0] || null;
+    if (!response.data || response.data.length === 0) return null;
+
+    const orderData = response.data[0];
+    return {
+      id: orderData.id,
+      ...orderData.attributes,
+    };
   } catch (error) {
     console.error('Error obteniendo pedido:', error);
     return null;

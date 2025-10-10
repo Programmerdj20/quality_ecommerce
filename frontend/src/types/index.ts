@@ -53,3 +53,25 @@ export type {
   LoginCredentials,
   RegisterData,
 } from './api';
+
+// Tipos de Multi-Tenant
+export type {
+  Tenant,
+  TenantPlan,
+  TenantConfig,
+  TenantContext,
+  TenantStrapiResponse,
+  TenantsStrapiResponse,
+} from './tenant';
+
+// Re-exportar funciones helper de tenant
+export {
+  isTenant,
+  isTenantContext,
+  tenantToContext,
+  getTenantLogo,
+  getTenantDisplayName,
+  getTenantIVA,
+  getTenantCurrency,
+  hasMercadoPagoConfigured,
+} from './tenant';

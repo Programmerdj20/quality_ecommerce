@@ -1,16 +1,31 @@
 /**
  * Cargador y generador de temas dinámicos
  * Transforma la configuración del tema en CSS Variables
+ * Soporta multi-tenant para cargar temas por tenant
  */
 
 import type { SiteConfig, Theme } from '@/types';
-import { getSiteConfig } from '@/utils/api/strapiApi';
+import { getSiteConfig, getThemes, getActiveTheme } from '@/utils/api/strapiApi';
 
 /**
- * Cargar configuración del sitio (con tema activo)
+ * Cargar configuración del sitio (con tema activo) de un tenant específico
  */
-export async function loadSiteConfig(): Promise<SiteConfig> {
-  return await getSiteConfig();
+export async function loadSiteConfig(tenantId?: string, tenantDomain?: string): Promise<SiteConfig> {
+  return await getSiteConfig(tenantId, tenantDomain);
+}
+
+/**
+ * Cargar tema activo del tenant
+ */
+export async function loadTenantTheme(tenantId: string, tenantDomain?: string): Promise<Theme> {
+  return await getActiveTheme(tenantId, tenantDomain);
+}
+
+/**
+ * Cargar todos los themes disponibles del tenant
+ */
+export async function loadTenantThemes(tenantId: string, tenantDomain?: string): Promise<Theme[]> {
+  return await getThemes(tenantId, tenantDomain);
 }
 
 /**
