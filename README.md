@@ -286,6 +286,18 @@ VITE_SUPABASE_URL=https://lcojyculicexqcpugrdf.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
+### Credenciales de Acceso al Panel Admin
+
+**Usuario de Prueba**:
+```
+Email: admin@demo1.com
+Password: AdminDemo123!
+URL Local: http://localhost:5173
+Tenant: Tienda Demo 1 (demo1)
+```
+
+**Nota**: El usuario fue creado usando el método oficial de Supabase Dashboard (Authentication > Users > Add user). Este es el método correcto que garantiza compatibilidad con `signInWithPassword()`.
+
 ### Instalación y Uso
 
 ```bash
@@ -535,6 +547,27 @@ pnpm preview      # Preview del build
 
 ---
 
+## 🔧 Notas Técnicas y Troubleshooting
+
+### Panel Administrativo
+
+#### ✅ Creación de Usuarios Admin
+
+**Método CORRECTO**: Usar el Dashboard de Supabase o `supabase.auth.admin.createUser()`
+
+**❌ NO hacer**: Insertar directamente en `auth.users` con SQL manual (causa error "Database error querying schema")
+
+**Pasos verificados para crear usuarios**:
+1. Ir a Supabase Dashboard → Authentication → Users
+2. Click "Add user" → "Create new user"
+3. Llenar email, password, activar "Auto Confirm User"
+4. Agregar User Metadata JSON con `tenant_id`
+5. El usuario funcionará correctamente con `signInWithPassword()`
+
+**Error común**: Si intentas crear usuarios manualmente con `INSERT INTO auth.users`, obtendrás un error 500 "Database error querying schema" al hacer login. Esto sucede porque Supabase Auth requiere campos internos específicos que solo se configuran correctamente usando los métodos oficiales.
+
+---
+
 ## 📄 Licencia
 
 Propietario - Todos los derechos reservados
@@ -601,7 +634,7 @@ Propietario - Todos los derechos reservados
   - Base de datos creada y funcional
   - RLS policies implementadas
   - Vistas y triggers configurados
-- [x] **Fase 2: Autenticación** ✅
+- [x] **Fase 2: Autenticación** ✅ FUNCIONAL
   - Cliente de Supabase configurado
   - AuthProvider con Context de React
   - LoginForm con validación Zod
@@ -611,6 +644,10 @@ Propietario - Todos los derechos reservados
   - React Router 7 configurado
   - TanStack Query 5 configurado
   - Build de producción exitoso
+  - ✅ Usuario admin creado correctamente (admin@demo1.com)
+  - ✅ Login funcional verificado
+  - ✅ Dashboard accesible
+  - ✅ Logout funcional
 
 ### 🚧 En Desarrollo
 
@@ -665,8 +702,8 @@ Propietario - Todos los derechos reservados
 2. ✅ ~~Carrito de compras~~ **COMPLETADO**
 3. ✅ ~~Páginas del catálogo~~ **COMPLETADO**
 4. ✅ ~~Migración a Supabase~~ **COMPLETADO**
-5. ✅ ~~Panel Admin - Fase 2: Autenticación~~ **COMPLETADO**
-6. 🚧 **Panel Admin - Fase 3: Layout y Navegación** (En progreso)
+5. ✅ ~~Panel Admin - Fase 2: Autenticación~~ **COMPLETADO Y VERIFICADO** ✅
+6. 🚧 **Panel Admin - Fase 3: Layout y Navegación** (Siguiente - LISTO PARA EMPEZAR)
 7. **Panel Admin - Fase 4: Dashboard con métricas**
 8. **Panel Admin - Fase 5: Gestión de pedidos**
 9. **Completar integración checkout con Mercado Pago**
@@ -676,5 +713,5 @@ Propietario - Todos los derechos reservados
 
 ---
 
-**Versión:** 0.3.0 (Beta) - Panel Admin Fase 2 completada
+**Versión:** 0.3.1 (Beta) - Panel Admin Fase 2 completada y verificada
 **Última actualización:** 2025-10-14
