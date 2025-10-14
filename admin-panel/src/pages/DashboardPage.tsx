@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -7,51 +6,47 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
+import { LayoutDashboard } from 'lucide-react'
 
 export function DashboardPage() {
-  const { user, signOut } = useAuth()
-
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error)
-    }
-  }
+  const { user } = useAuth()
 
   return (
-    <div className="min-h-screen bg-muted/40 p-8">
-      <div className="mx-auto max-w-4xl space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Panel de Administración</h1>
-            <p className="text-muted-foreground">
-              Bienvenido, {user?.email}
-            </p>
-          </div>
-          <Button variant="outline" onClick={handleSignOut}>
-            Cerrar Sesión
-          </Button>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <div className="flex items-center gap-3">
+        <LayoutDashboard className="h-8 w-8 text-primary" />
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Bienvenido, {user?.email}
+          </p>
         </div>
+      </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Dashboard</CardTitle>
-            <CardDescription>
-              Vista principal del panel administrativo
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              ¡Autenticación exitosa! 🎉
-            </p>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Este es un placeholder para el dashboard. En la Fase 4
-              implementaremos métricas, gráficos y estadísticas de la plataforma.
-            </p>
-          </CardContent>
-        </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Vista General</CardTitle>
+          <CardDescription>
+            Resumen de métricas y estadísticas principales
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex h-[300px] items-center justify-center rounded-lg border-2 border-dashed">
+            <div className="text-center">
+              <LayoutDashboard className="mx-auto h-12 w-12 text-muted-foreground" />
+              <p className="mt-4 text-lg font-medium">
+                Próximamente - Fase 4
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Aquí se mostrarán métricas, gráficos de ventas y estadísticas de
+                la plataforma.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Información de la Sesión</CardTitle>
@@ -69,6 +64,29 @@ export function DashboardPage() {
               <span className="font-mono text-sm text-muted-foreground">
                 {user?.id}
               </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Estado del Sistema</CardTitle>
+            <CardDescription>
+              Panel administrativo funcional
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-medium">Autenticación:</span>
+              <span className="text-green-600 dark:text-green-400">✓ Activa</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-medium">Navegación:</span>
+              <span className="text-green-600 dark:text-green-400">✓ Funcional</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-medium">Fase 3:</span>
+              <span className="text-green-600 dark:text-green-400">✓ Completada</span>
             </div>
           </CardContent>
         </Card>

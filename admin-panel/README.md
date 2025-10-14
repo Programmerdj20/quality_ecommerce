@@ -56,19 +56,24 @@ pnpm lint         # ESLint
 ```
 src/
 ├── components/
-│   ├── ui/              # Componentes Shadcn/ui
-│   ├── auth/            # Autenticación (AuthProvider, LoginForm, etc)
-│   └── layout/          # Layout (Sidebar, Header, etc) [Fase 3]
+│   ├── ui/              # Componentes Shadcn/ui (button, card, sheet, etc)
+│   ├── auth/            # Autenticación (AuthProvider, LoginForm, ProtectedRoute)
+│   └── layout/          # Layout (AppLayout, Sidebar, Header, MobileMenu) ✅
 ├── pages/               # Páginas
-│   ├── LoginPage.tsx
-│   └── DashboardPage.tsx
+│   ├── LoginPage.tsx        # Login
+│   ├── DashboardPage.tsx    # Dashboard principal ✅
+│   ├── OrdersPage.tsx       # Gestión de pedidos (placeholder)
+│   ├── ThemesPage.tsx       # Gestión de temas (placeholder)
+│   └── SettingsPage.tsx     # Configuración (placeholder)
 ├── lib/                 # Utilidades
 │   ├── supabase.ts     # Cliente Supabase
-│   └── utils.ts        # Helpers
+│   └── utils.ts        # Helpers (cn, formatDate)
 ├── hooks/               # Custom hooks
-│   └── useAuth.ts
+│   └── useAuth.ts      # Hook de autenticación
 ├── types/               # TypeScript types
-└── App.tsx              # Router principal
+│   ├── user.ts
+│   └── index.ts
+└── App.tsx              # Router principal con todas las rutas
 ```
 
 ## Estado del Proyecto
@@ -91,11 +96,15 @@ src/
 - useAuth custom hook
 - Usuario de prueba creado
 
-### 🚧 Fase 3: Layout y Navegación (En progreso)
-- AppLayout con sidebar + header
-- Sidebar con navegación
-- Header con usuario + logout
-- Responsive mobile menu
+### ✅ Fase 3: Layout y Navegación
+- ✅ AppLayout con sidebar + header integrados
+- ✅ Sidebar con navegación y rutas activas
+- ✅ Header con avatar, dropdown menu y logout
+- ✅ Responsive mobile menu con Sheet de Shadcn
+- ✅ Páginas placeholder (Orders, Themes, Settings)
+- ✅ Navegación completa entre secciones
+- ✅ Build de producción exitoso
+- ✅ Componentes Shadcn: sheet, avatar, dropdown-menu, separator
 
 ### ⏳ Pendiente
 - Fase 4: Dashboard con métricas
