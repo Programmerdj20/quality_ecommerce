@@ -9,7 +9,7 @@ import { Package } from 'lucide-react'
 
 export function OrdersPage() {
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Package className="h-8 w-8 text-primary" />
         <div>
