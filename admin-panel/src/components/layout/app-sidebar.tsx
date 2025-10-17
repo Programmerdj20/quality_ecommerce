@@ -20,6 +20,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
   SidebarSeparator,
+  useSidebar,
 } from '@/components/ui/sidebar'
 import { useAuth } from '@/hooks/useAuth'
 import { useIsMobile } from '@/hooks/use-mobile'
@@ -77,6 +78,13 @@ export function AppSidebar() {
   const location = useLocation()
   const { user } = useAuth()
   const isMobile = useIsMobile()
+  const { setOpenMobile } = useSidebar()
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
 
   return (
     <Sidebar collapsible={isMobile ? 'offcanvas' : 'none'}>
@@ -84,7 +92,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link to="/dashboard">
+              <Link to="/dashboard" onClick={handleLinkClick}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <ShoppingBag className="size-4" />
                 </div>
@@ -128,7 +136,7 @@ export function AppSidebar() {
                             <span>{item.name}</span>
                           </div>
                         ) : (
-                          <Link to={item.href} className="flex items-center gap-2">
+                          <Link to={item.href} onClick={handleLinkClick} className="flex items-center gap-2">
                             <Icon className="size-4" />
                             <span>{item.name}</span>
                           </Link>
