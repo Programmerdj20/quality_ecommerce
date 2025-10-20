@@ -59,35 +59,44 @@ src/
 ├── components/
 │   ├── ui/              # Componentes Shadcn/ui ✅
 │   │   ├── button.tsx, card.tsx, table.tsx, sheet.tsx
+│   │   ├── dialog.tsx, select.tsx, input.tsx, badge.tsx   # ✅ Nuevos
 │   │   ├── sidebar.tsx        # Sidebar colapsable oficial de Shadcn ✅
 │   │   ├── tooltip.tsx        # Para tooltips en íconos del sidebar
 │   │   └── skeleton.tsx       # Loading states
-│   ├── auth/            # Autenticación (AuthProvider, LoginForm, ProtectedRoute)
+│   ├── auth/            # Autenticación (AuthProvider, LoginForm, ProtectedRoute) ✅
 │   ├── layout/          # Layout (AppLayout, AppSidebar, Header, MobileMenu) ✅
-│   └── dashboard/       # Dashboard components ✅
-│       ├── DashboardStats.tsx     # Cards de métricas
-│       ├── RevenueChart.tsx       # Gráfico de revenue
-│       └── TopProductsTable.tsx   # Tabla de top productos
+│   ├── dashboard/       # Dashboard components ✅
+│   │   ├── stats-cards.tsx        # Cards de métricas
+│   │   ├── revenue-chart.tsx      # Gráfico de revenue
+│   │   └── top-products-table.tsx # Tabla de top productos
+│   └── orders/          # Orders components ✅ NUEVO
+│       ├── order-status-badge.tsx # Badge de estados
+│       ├── order-filters.tsx      # Filtros y búsqueda
+│       ├── orders-table.tsx       # Tabla de pedidos
+│       └── order-details.tsx      # Modal de detalles
 ├── pages/               # Páginas
-│   ├── LoginPage.tsx        # Login
+│   ├── LoginPage.tsx        # Login ✅
 │   ├── DashboardPage.tsx    # Dashboard principal ✅
-│   ├── OrdersPage.tsx       # Gestión de pedidos (placeholder)
+│   ├── OrdersPage.tsx       # Gestión de pedidos ✅ COMPLETO
 │   ├── ThemesPage.tsx       # Gestión de temas (placeholder)
 │   └── SettingsPage.tsx     # Configuración (placeholder)
 ├── lib/                 # Utilidades
-│   ├── supabase.ts     # Cliente Supabase
-│   └── utils.ts        # Helpers (cn, formatDate)
+│   ├── supabase.ts     # Cliente Supabase ✅
+│   └── utils.ts        # Helpers (cn, formatDate) ✅
 ├── hooks/               # Custom hooks
-│   ├── useAuth.ts           # Hook de autenticación
-│   ├── use-mobile.ts        # Hook para detectar mobile (Shadcn) ✅
+│   ├── useAuth.ts           # Hook de autenticación ✅
+│   ├── use-mobile.ts        # Hook para detectar mobile ✅
 │   ├── useOrdersStats.ts    # Hook para métricas de pedidos ✅
 │   ├── useRevenueChart.ts   # Hook para datos del gráfico ✅
-│   └── useTopProducts.ts    # Hook para top productos ✅
+│   ├── useTopProducts.ts    # Hook para top productos ✅
+│   ├── useOrders.ts         # Hook para pedidos con filtros ✅ NUEVO
+│   └── useOrderMutation.ts  # Hook para actualizar pedidos ✅ NUEVO
 ├── types/               # TypeScript types
-│   ├── user.ts
-│   ├── dashboard.ts    # Types del dashboard ✅
+│   ├── user.ts          # Types de usuario ✅
+│   ├── dashboard.ts     # Types del dashboard ✅
+│   ├── order.ts         # Types de pedidos ✅ NUEVO
 │   └── index.ts
-└── App.tsx              # Router principal con todas las rutas
+└── App.tsx              # Router principal con todas las rutas ✅
 ```
 
 ## Estado del Proyecto
@@ -144,10 +153,32 @@ src/
 - ✅ Componentes Shadcn: table
 - ✅ Build de producción exitoso (939 KB con sidebar colapsable)
 
+### ✅ Fase 5: Gestión de Pedidos
+- ✅ Sistema completo de gestión de pedidos implementado
+- ✅ TypeScript types para Order, OrderStatus, OrderFilters
+- ✅ Custom hooks:
+  - `useOrders()` - Fetching con filtros y paginación
+  - `useOrderMutation()` - Actualización de estados
+- ✅ Componentes implementados:
+  - `OrderStatusBadge` - Badge con colores por estado
+  - `OrderFilters` - Buscador y filtro por estado
+  - `OrdersTable` - Tabla responsive con paginación
+  - `OrderDetails` - Modal completo con detalles y cambio de estado
+- ✅ Funcionalidades:
+  - Lista de pedidos con paginación (20 por página)
+  - Filtro por estado (pending, processing, completed, cancelled)
+  - Búsqueda por cliente o email
+  - Modal de detalles con información completa del pedido
+  - Cambio de estado inline con actualización automática
+  - Formateo de moneda y fechas
+  - Loading states y error handling completos
+- ✅ Componentes Shadcn: dialog, select (además de los anteriores)
+- ✅ Build de producción exitoso (1.07 MB)
+
 ### ⏳ Pendiente
-- Fase 5: Gestión de pedidos
 - Fase 6: Gestión de temas
 - Fase 7: Configuración de sitio
+- Fase 8: Testing y Deploy
 
 ## Documentación
 
