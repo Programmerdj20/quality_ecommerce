@@ -1,0 +1,3 @@
+{
+    "query": "query { __type(name: \"StockItemFilterInput\") { inputFields { name } } }"
+}

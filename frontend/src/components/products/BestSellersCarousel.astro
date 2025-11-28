@@ -1,0 +1,153 @@
+---
+import type { Product } from "@/types";
+import ProductCard from "./ProductCard.astro";
+
+interface Props {
+    products: Product[];
+}
+
+const { products } = Astro.props;
+const carouselId = `bestsellers-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class="relative group">
+    <div
+        id={carouselId}
+        class="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar scroll-smooth"
+    >
+        {
+            products.map((product) => (
+                <div class="flex-none w-[85%] sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] snap-start">
+                    <ProductCard product={product} />
+                </div>
+            ))
+        }
+    </div>
+
+    <!-- Controles (opcional, por si el usuario quiere navegar manual) -->
+    <button
+        class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 disabled:opacity-0"
+        data-action="prev"
+        data-target={carouselId}
+    >
+        <svg
+            class="w-6 h-6 text-gray-800"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"></path></svg
+        >
+    </button>
+
+    <button
+        class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 disabled:opacity-0"
+        data-action="next"
+        data-target={carouselId}
+    >
+        <svg
+            class="w-6 h-6 text-gray-800"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"></path></svg
+        >
+    </button>
+</div>
+
+<style>
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const carousels = document.querySelectorAll('[id^="bestsellers-"]');
+
+        carousels.forEach((carousel) => {
+            if (!(carousel instanceof HTMLElement)) return;
+
+            const prevBtn = document.querySelector(
+                `button[data-target="${carousel.id}"][data-action="prev"]`,
+            );
+            const nextBtn = document.querySelector(
+                `button[data-target="${carousel.id}"][data-action="next"]`,
+            );
+
+            let autoScrollInterval: number | null = null;
+            const scrollAmount = () => {
+                const item = carousel.querySelector("div");
+                return item ? item.offsetWidth + 24 : 0; // width + gap
+            };
+
+            const scroll = (direction: "left" | "right") => {
+                const amount = scrollAmount();
+                if (direction === "left") {
+                    if (carousel.scrollLeft <= 0) {
+                        // Si está al principio, ir al final (efecto loop visual simple)
+                        carousel.scrollTo({
+                            left: carousel.scrollWidth,
+                            behavior: "smooth",
+                        });
+                    } else {
+                        carousel.scrollBy({
+                            left: -amount,
+                            behavior: "smooth",
+                        });
+                    }
+                } else {
+                    // Si llegamos al final (con un margen de error)
+                    if (
+                        carousel.scrollLeft + carousel.clientWidth >=
+                        carousel.scrollWidth - 10
+                    ) {
+                        carousel.scrollTo({ left: 0, behavior: "smooth" });
+                    } else {
+                        carousel.scrollBy({ left: amount, behavior: "smooth" });
+                    }
+                }
+            };
+
+            const startAutoScroll = () => {
+                if (autoScrollInterval) clearInterval(autoScrollInterval);
+                autoScrollInterval = window.setInterval(() => {
+                    scroll("right");
+                }, 3000); // 3 segundos por item
+            };
+
+            const stopAutoScroll = () => {
+                if (autoScrollInterval) {
+                    clearInterval(autoScrollInterval);
+                    autoScrollInterval = null;
+                }
+            };
+
+            // Event Listeners
+            carousel.addEventListener("mouseenter", stopAutoScroll);
+            carousel.addEventListener("mouseleave", startAutoScroll);
+
+            prevBtn?.addEventListener("mouseenter", stopAutoScroll);
+            prevBtn?.addEventListener("mouseleave", startAutoScroll);
+            prevBtn?.addEventListener("click", () => scroll("left"));
+
+            nextBtn?.addEventListener("mouseenter", stopAutoScroll);
+            nextBtn?.addEventListener("mouseleave", startAutoScroll);
+            nextBtn?.addEventListener("click", () => scroll("right"));
+
+            // Iniciar
+            startAutoScroll();
+        });
+    });
+</script>

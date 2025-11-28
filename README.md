@@ -2,7 +2,7 @@
 
 **Plataforma e-commerce multi-tenant para servir 400+ tiendas online con una sola infraestructura**
 
-Arquitectura SaaS construida con Astro.js, Supabase, y Mercado Pago.
+Arquitectura SaaS construida con **Astro.js** (Frontend), **React** (Admin Panel), **Supabase** (Backend) y **Mercado Pago** (Pagos).
 
 ---
 
@@ -29,9 +29,9 @@ Cada **tenant** (cliente) tiene su propia tienda online con:
                   ▼
 ┌──────────────────────────────────────────────────┐
 │  CLOUDFLARE PAGES (Frontend Multi-Tenant)        │
+│  • Astro SSR Híbrido                             │
 │  • Detecta tenant por hostname                   │
-│  • Carga configuración del tenant                │
-│  • Aplica branding dinámico                      │
+│  • Carga configuración y temas dinámicamente    │
 └─────────────────┬────────────────────────────────┘
                   │
                   ▼
@@ -47,8 +47,8 @@ Cada **tenant** (cliente) tiene su propia tienda online con:
 ┌──────────────────────────────────────────────────┐
 │  PANEL ADMINISTRATIVO (React SPA)                │
 │  • Gestión de pedidos por tenant                 │
-│  • Dashboard con métricas                        │
-│  • Configuración de temas                        │
+│  • Dashboard con métricas en tiempo real         │
+│  • Gestión de temas y configuración              │
 │  • Deploy en Cloudflare Pages                    │
 └──────────────────────────────────────────────────┘
 ```
@@ -63,6 +63,7 @@ Cada **tenant** (cliente) tiene su propia tienda online con:
 | Mantenimiento complejo | Mantenimiento centralizado |
 
 **Costo por tenant**: $0.06 - $0.50/mes (vs $5/mes con infraestructura dedicada)
+**Ahorro**: 96% en costos de infraestructura
 
 ---
 
@@ -74,38 +75,267 @@ Cada **tenant** (cliente) tiene su propia tienda online con:
 - ✅ **Multi-Dominio** (subdominios + custom domains)
 - ✅ **Tokens dinámicos** (Quality API + Mercado Pago por tenant)
 - ✅ **Configuración regional** (IVA, moneda, país por tenant)
+- ✅ **Row Level Security** garantizado en todas las tablas
 
-### Frontend (Tienda E-commerce)
-- ✅ **Astro.js 5.x** con SSR híbrido
-- ✅ **Tailwind CSS 4.x** con variables CSS dinámicas
-- ✅ **Sistema de temas dinámicos** por tenant
-- ✅ **Detección automática de tenant** por hostname
-- ✅ **TypeScript strict** en todo el proyecto
-- ✅ **Carrito de compras** con Nanostores y persistencia
-- ✅ **Responsive y optimizado** para móviles
+---
 
-### Backend (Supabase)
-- ✅ **PostgreSQL** con Row Level Security (RLS)
-- ✅ **Supabase Auth** con JWT y sesiones persistentes
-- ✅ **Aislamiento multi-tenant** automático vía RLS policies
-- ✅ **Vistas optimizadas** (orders_summary, top_products, daily_revenue)
-- ✅ **Índices de performance** en tablas críticas
-- ✅ **Triggers automáticos** para updated_at
+## 🛍️ Frontend (Tienda E-commerce)
 
-### Panel Administrativo
-- ✅ **React 19** + **Vite 7** + **TypeScript**
-- ✅ **Autenticación completa** (Fase 2 ✅)
-- ✅ **Shadcn/ui** para componentes modernos
-- ✅ **React Router 7** para navegación
-- ✅ **TanStack Query** para data fetching
-- 🚧 **Dashboard con métricas** (Fase 4)
-- 🚧 **Gestión de pedidos** (Fase 5)
-- 🚧 **Configuración de temas** (Fase 6)
+### Stack Tecnológico
 
-### Integraciones
-- ✅ **Quality API** (backend contable existente) con tokens dinámicos
-- ✅ **Mercado Pago Multi-Tenant** con tokens por cliente
-- ✅ **Cloudflare CDN** global con SSL automático
+- **Astro.js 5.14.1** - Framework web moderno con SSR híbrido
+- **Tailwind CSS 4.1.13** - Framework CSS utility-first
+- **TypeScript strict mode** - Tipado estático completo
+- **Nanostores 1.0.1** - State management ligero y reactivo
+- **Mercado Pago SDK 0.0.3** - Integración de pagos
+- **Zod 4.1.11** - Validación de esquemas
+- **node-cache 5.1.2** - Sistema de caché en memoria
+
+### Funcionalidades Completadas ✅
+
+- ✅ **Catálogo de productos** con filtros por categoría y precio
+- ✅ **Sistema de temas dinámicos** con detección de tenant automática
+- ✅ **Carrito de compras** persistente en localStorage
+- ✅ **Detección multi-tenant** automática por hostname
+- ✅ **Búsqueda modal** de productos
+- ✅ **Scroll infinito** en catálogo
+- ✅ **Banner carousel** en home
+- ✅ **Responsive completo** (mobile, tablet, desktop)
+- ✅ **Layouts principales** (Header, Footer, Navigation, MobileMenu)
+- ✅ **Sistema de notificaciones** (toast)
+
+### En Desarrollo 🚧
+
+- 🚧 **Checkout con Mercado Pago**
+  - API Routes para crear preferencias
+  - Webhooks de Mercado Pago
+  - Páginas de resultado (success, pending, failure)
+  - Store de órdenes
+
+### Arquitectura Frontend
+
+**Detección de Tenant**:
+- Extrae hostname del request (ej: `cliente1.com`)
+- Consulta Supabase por tenant usando `getTenantByDomain()`
+- Carga configuración y tema activo del tenant
+- Aplica branding dinámicamente
+- Caché en memoria con TTL de 5 minutos
+
+**Sistema de Temas**:
+- Almacenados en tabla `themes` de Supabase
+- ThemeProvider inyecta CSS Variables dinámicamente
+- Tailwind CSS consume variables para estilos
+- Cambios sin rebuild necesario
+
+**State Management**:
+- `cartStore` - Carrito de compras persistente
+- `orderStore` - Órdenes completadas
+- `toastStore` - Notificaciones
+
+### Componentes Principales
+
+```
+src/components/
+├── products/          # ProductCard, ProductGrid, ProductCarousel
+├── cart/              # CartDrawer, CartItem
+├── checkout/          # CheckoutForm, PaymentMethodSelector
+├── home/              # BannerCarousel, CategorySidebar
+├── layout/            # Header, Footer, Navigation
+├── theme/             # ThemeProvider, themLoader
+└── search/            # SearchModal
+```
+
+---
+
+## 🎛️ Panel Administrativo
+
+### Stack Tecnológico
+
+- **React 19.1.1** - Library UI moderna
+- **Vite 7.1.7** - Build tool ultra-rápido
+- **TypeScript 5.9.3** - Tipado estático strict
+- **React Router 7.30.1** - Routing client-side
+- **TanStack Query 5.90.3** - Data fetching + cache
+- **Shadcn/ui 20 componentes** - Componentes UI modernos
+- **Tailwind CSS 4.1.14** - Framework CSS utility-first
+- **Recharts 2.15.4** - Gráficos para dashboard
+- **Sonner 2.0.7** - Sistema de notificaciones toast
+- **Zod 4.1.12** - Validación de schemas
+- **Lucide React 0.545.0** - Iconos modernos
+
+### Fases Implementadas (7 de 8 - 87% Completado)
+
+#### ✅ Fase 0: Setup Inicial
+- Proyecto Vite + React + TypeScript
+- Tailwind CSS 4 + Shadcn/ui
+- Path aliases (@/ configurado)
+- ESLint con React plugins
+
+#### ✅ Fase 1: Supabase Setup
+- Base de datos PostgreSQL 17.6.1 configurada
+- Row Level Security (RLS) implementado - 12 policies
+- Vistas analíticas creadas (5 vistas)
+- Índices de performance (11 índices)
+- Seed data inicial
+
+#### ✅ Fase 2: Autenticación
+- Login con email + password usando Supabase Auth
+- Logout funcional
+- Persistencia de sesión con JWT en localStorage
+- Auto-refresh de tokens
+- ProtectedRoute para rutas privadas
+- Validación de formularios con Zod
+- Manejo de errores de autenticación
+
+#### ✅ Fase 3: Layout y Navegación
+- Sidebar colapsable con navegación
+- Header con avatar y dropdown menu
+- Responsive mobile menu con Sheet
+- Breadcrumbs y rutas activas
+- 5 páginas principales (Login, Dashboard, Orders, Themes, Settings)
+- Build de producción exitoso
+
+#### ✅ Fase 4: Dashboard con Métricas
+- **4 cards de estadísticas**:
+  - Total de pedidos
+  - Revenue total
+  - Pedidos pendientes
+  - Valor promedio de pedidos
+- **Gráfico de ingresos** (Recharts) - últimos 7 días
+- **Top 5 productos** más vendidos
+- Loading states y error handling completo
+- Formateo de moneda (COP) y fechas en español
+
+#### ✅ Fase 5: Gestión de Pedidos
+- Lista de pedidos con **paginación** (20 por página)
+- **Filtros**: por estado (pending, processing, completed, cancelled)
+- **Búsqueda**: por cliente o email
+- **Modal de detalles** completo con información de orden
+- **Cambio de estado inline** con actualización automática
+- Badge de estados con colores distintivos
+- Loading y error states
+
+#### ✅ Fase 6: Gestión de Temas
+- Lista de temas disponibles desde Supabase
+- **Preview visual** de colores (primary, secondary, accent, background)
+- Mostrar tema activo del tenant actual
+- **Activar tema** con un clic
+- Actualización automática en BD
+- Notificaciones toast de éxito/error
+- Grid responsive (1/2/3 columnas)
+
+#### ✅ Fase 7: Configuración de Sitio
+- **4 tabs organizados**:
+  1. **Contacto**: WhatsApp, email, teléfono
+  2. **Redes Sociales**: Facebook, Instagram, Twitter URLs
+  3. **Regional**: IVA (%), moneda (ISO 3), país
+  4. **Textos**: Nombre tienda, slogan, mensaje bienvenida
+- Validación con Zod
+- Auto-guardado con React Query mutations
+- Crear o actualizar configuración automáticamente
+- Loading states durante guardado
+
+#### ⏳ Fase 8: Testing y Deploy (PENDIENTE)
+- Testing manual de todas las features
+- Testing E2E
+- Deploy en Cloudflare Pages
+- Variables de entorno en producción
+
+### Custom Hooks (12 hooks)
+
+**Autenticación**:
+- `useAuth()` - Usuario actual, login, logout
+
+**Data Fetching**:
+- `useOrders()` - Pedidos con filtros y paginación
+- `useThemes()` - Temas disponibles
+- `useActiveTenant()` - Tenant del usuario actual
+- `useSiteConfig()` - Configuración del sitio
+- `useOrdersStats()` - Estadísticas dashboard
+- `useRevenueChart()` - Gráfico de revenue
+- `useTopProducts()` - Top productos
+
+**Mutaciones**:
+- `useOrderMutation()` - Actualizar estados de pedidos
+- `useActivateTheme()` - Activar temas
+- `useUpdateSiteConfig()` - Guardar configuración
+
+**UI**:
+- `use-mobile()` - Detectar dispositivo móvil
+
+### Componentes Shadcn/ui (20 componentes)
+
+Button, Input, Label, Card, Table, Dialog, Badge, Select, Tabs, Textarea, Sheet, Avatar, Dropdown Menu, Separator, Skeleton, Tooltip, Chart, Sidebar, Alert, Sonner
+
+### Rutas
+
+- `/login` - Login (público)
+- `/dashboard` - Dashboard principal (protegido)
+- `/orders` - Gestión de pedidos (protegido)
+- `/themes` - Gestión de temas (protegido)
+- `/settings` - Configuración (protegido)
+
+### Credenciales de Prueba
+
+```
+Email: admin@demo1.com
+Password: AdminDemo123!
+Tenant: Tienda Demo 1 (demo1)
+```
+
+---
+
+## 🗄️ Backend (Supabase)
+
+### Información del Proyecto
+
+- **URL**: https://lcojyculicexqcpugrdf.supabase.co
+- **Región**: us-east-1
+- **PostgreSQL**: 17.6.1
+- **Plan**: Free Tier
+- **Estado**: ACTIVE_HEALTHY ✅
+
+### Schema de Base de Datos
+
+**4 Tablas Principales**:
+
+1. **themes** - Temas visuales reutilizables
+   - 3 temas: Default, Black Friday, Navidad
+   - JSONB colors (7 colores)
+   - Público para lectura
+
+2. **tenants** - Clientes/tiendas
+   - Información de cada tenant
+   - Tokens encriptados (Quality API, Mercado Pago)
+   - Configuración regional
+
+3. **orders** - Pedidos
+   - Relación N:1 con tenants
+   - Estados: pending, processing, completed, cancelled
+   - JSONB items (array de productos)
+   - 11 índices para performance
+
+4. **site_config** - Configuración por tenant (1:1)
+   - Contacto, redes sociales, políticas
+   - JSONB features y business_hours
+
+### Row Level Security (RLS)
+
+**12 policies** implementadas para aislamiento multi-tenant:
+- **themes**: Lectura pública, escritura solo super-admin
+- **tenants**: Usuarios ven solo su tenant, super-admin ve todos
+- **orders**: Aislamiento estricto por tenant_id
+- **site_config**: Completamente aislado por tenant
+
+**Seguridad garantizada**: Un tenant NUNCA ve datos de otro.
+
+### Vistas Analíticas (5)
+
+1. **orders_summary** - Métricas agregadas (total pedidos, revenue, etc.)
+2. **top_products** - Productos más vendidos
+3. **daily_revenue** - Ingresos diarios (últimos 30 días)
+4. **orders_by_status** - Conteo por estado
+5. **recent_orders** - Pedidos recientes (últimos 7 días)
 
 ---
 
@@ -115,215 +345,68 @@ Cada **tenant** (cliente) tiene su propia tienda online con:
 quality_ecommerce/
 ├── frontend/                    # Astro.js (Tienda E-commerce)
 │   ├── src/
-│   │   ├── components/         # Componentes reutilizables
-│   │   │   ├── theme/         # Sistema de temas
-│   │   │   ├── products/      # Componentes de productos
-│   │   │   ├── cart/          # Carrito de compras
-│   │   │   ├── checkout/      # Proceso de checkout
-│   │   │   ├── seo/           # Componentes SEO
-│   │   │   └── layout/        # Header, Footer, Navigation
-│   │   ├── layouts/           # Layouts de páginas
-│   │   ├── pages/             # Páginas y rutas
-│   │   │   ├── index.astro    # Home
-│   │   │   ├── productos/     # Catálogo
-│   │   │   └── checkout/      # Checkout y resultados
-│   │   ├── types/             # Tipos TypeScript
-│   │   ├── utils/             # Utilidades
-│   │   │   ├── api/          # Clientes API
-│   │   │   ├── cache/        # Sistema de caché
-│   │   │   └── theme/        # Gestión de temas
-│   │   ├── stores/            # State management (Nanostores)
-│   │   └── styles/            # CSS global
-│   ├── public/                # Archivos estáticos
-│   ├── astro.config.mjs       # Configuración de Astro
-│   ├── tailwind.config.mjs    # Configuración de Tailwind
-│   ├── tsconfig.json          # Configuración de TypeScript
-│   ├── package.json           # Dependencias
-│   └── .env.example           # Variables de entorno de ejemplo
+│   │   ├── components/         # ProductCard, Cart, Checkout, etc.
+│   │   ├── layouts/            # BaseLayout
+│   │   ├── pages/              # Home, productos, checkout
+│   │   ├── types/              # TypeScript types
+│   │   ├── utils/              # API, cache, tenant, theme
+│   │   ├── stores/             # Nanostores
+│   │   └── styles/             # CSS global
+│   ├── astro.config.mjs        # Configuración Astro
+│   └── package.json
 │
-├── admin-panel/                # Panel Administrativo (React)
+├── admin-panel/                 # React + Vite (Panel Administrativo)
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── ui/            # Shadcn/ui components
-│   │   │   │   ├── button.tsx
-│   │   │   │   ├── input.tsx
-│   │   │   │   ├── label.tsx
-│   │   │   │   └── card.tsx
-│   │   │   └── auth/          # Componentes de autenticación
-│   │   │       ├── AuthProvider.tsx
-│   │   │       ├── LoginForm.tsx
-│   │   │       └── ProtectedRoute.tsx
-│   │   ├── pages/             # Páginas de la app
-│   │   │   ├── LoginPage.tsx
-│   │   │   └── DashboardPage.tsx
-│   │   ├── lib/               # Utilidades
-│   │   │   ├── supabase.ts   # Cliente de Supabase
-│   │   │   └── utils.ts      # Helpers (cn, formatDate)
-│   │   ├── hooks/             # Custom hooks
-│   │   │   └── useAuth.ts
-│   │   ├── types/             # TypeScript types
-│   │   │   ├── user.ts
-│   │   │   └── index.ts
-│   │   ├── App.tsx            # Router principal
-│   │   ├── main.tsx           # Entry point
-│   │   └── index.css          # Estilos globales
-│   ├── vite.config.ts         # Configuración de Vite
-│   ├── tailwind.config.js     # Configuración de Tailwind
-│   ├── components.json        # Configuración de Shadcn/ui
-│   ├── tsconfig.json          # Configuración de TypeScript
-│   ├── package.json           # Dependencias
-│   └── .env.local             # Variables de entorno
+│   │   ├── components/         # Auth, Layout, Dashboard, Orders, etc.
+│   │   ├── pages/              # LoginPage, DashboardPage, etc.
+│   │   ├── hooks/              # 12 custom hooks
+│   │   ├── lib/                # supabase.ts, utils.ts
+│   │   ├── types/              # TypeScript types
+│   │   ├── App.tsx             # Router
+│   │   └── main.tsx            # Entry point
+│   ├── vite.config.ts
+│   └── package.json
 │
-├── docs/                       # Documentación
-│   ├── PANEL_ADMIN_GUIA.md    # Guía completa del panel admin
-│   ├── SUPABASE_SCHEMA.md     # Schema de Supabase y RLS
-│   └── ...
-└── README.md                   # Este archivo
+├── docs/                        # Documentación
+│   ├── PANEL_ADMIN_GUIA.md      # Guía completa
+│   ├── DEPLOYMENT_CLOUDFLARE.md # Deploy frontend
+│   ├── DOMAIN_SETUP.md          # Multi-dominio
+│   ├── supabase_schema_v1.sql   # Schema completo
+│   └── supabase_migration_*.sql # Migraciones
+│
+└── README.md                    # Este archivo
 ```
 
 ---
 
-## 🛠️ Stack Tecnológico
+## 🛠️ Stack Tecnológico Completo
 
-### Frontend (Tienda E-commerce)
-- **Astro.js 5.x** - Framework web moderno
-- **Tailwind CSS 4.x** - Framework CSS utility-first
-- **TypeScript** - Tipado estático
-- **Nanostores** - State management ligero
-- **Zod** - Validación de esquemas
-- **node-cache** - Sistema de caché en memoria
-- **Mercado Pago SDK** - Integración de pagos
+### Frontend (Astro)
+- Astro 5.14.1
+- Tailwind CSS 4.1.13
+- TypeScript
+- Nanostores 1.0.1
+- Mercado Pago SDK
 
-### Panel Administrativo
-- **React 19** - Library UI moderna
-- **Vite 7** - Build tool ultra-rápido
-- **TypeScript** - Type safety (strict mode)
-- **React Router 7** - Routing con data loaders
-- **TanStack Query 5** - Data fetching + cache
-- **Zod** - Validación de schemas
-- **Shadcn/ui** - Componentes UI (Radix + Tailwind)
-- **Tailwind CSS 4** - Utility CSS
-- **Lucide React** - Iconos modernos
-- **Recharts** (próximamente) - Gráficos para dashboard
+### Admin Panel (React)
+- React 19.1.1
+- Vite 7.1.7
+- TypeScript 5.9.3
+- TanStack Query 5.90.3
+- Shadcn/ui (20 componentes)
+- Recharts 2.15.4
+- Sonner 2.0.7
 
-### Backend (Supabase)
-- **PostgreSQL 17** - Base de datos relacional
-- **Row Level Security (RLS)** - Aislamiento multi-tenant
-- **Supabase Auth** - Autenticación JWT
-- **Supabase Client** - SDK para React/Astro
-- **Vistas Materializadas** - Performance optimizada
-- **Triggers** - Automatización (updated_at)
+### Backend
+- PostgreSQL 17.6.1
+- Supabase Auth
+- Row Level Security (RLS)
+- Vistas optimizadas
 
-### Infraestructura Multi-Tenant
-- **Cloudflare Pages** - Frontend Astro + Panel Admin (gratis, ilimitado)
-- **Supabase** - PostgreSQL + Auth + RLS ($0-25/mes según uso)
-- **Cloudflare DNS** - Multi-dominio con SSL automático
-- **Mercado Pago** - Pasarela de pagos (tokens dinámicos por tenant)
-
----
-
-## 🎛️ Panel Administrativo
-
-### ¿Qué es?
-
-Panel administrativo **custom** para gestionar la plataforma multi-tenant Quality E-commerce. Reemplaza Strapi con una solución más simple, rápida y económica.
-
-### Ventajas vs Strapi
-
-| Strapi Admin | Panel Custom |
-|--------------|--------------|
-| 1500+ líneas código backend | ~500 líneas React |
-| $85/mes (Railway + PostgreSQL) | $25/mes (Supabase) |
-| Lento y pesado | Rápido y ligero |
-| Difícil de personalizar | 100% personalizable |
-| Multi-tenant complejo | Multi-tenant simple (RLS) |
-
-### Stack Tecnológico
-
-- **React 19** + **Vite 7** + **TypeScript 5**
-- **Supabase** (PostgreSQL + Auth)
-- **Shadcn/ui** (Radix UI + Tailwind CSS)
-- **React Router 7** para navegación
-- **TanStack Query 5** para data fetching
-- **Zod** para validación
-
-### Funcionalidades Implementadas
-
-#### ✅ Fase 2: Autenticación (COMPLETADA)
-- ✅ Login con email + password
-- ✅ Logout funcional
-- ✅ Persistencia de sesión (JWT en localStorage)
-- ✅ Protección de rutas (ProtectedRoute)
-- ✅ Validación de formularios con Zod
-- ✅ Manejo de errores de autenticación
-- ✅ UI moderna con Shadcn/ui
-- ✅ TypeScript type-safe
-
-#### 🚧 Fase 3: Layout y Navegación (Pendiente)
-- Sidebar con navegación
-- Header con usuario + logout
-- Responsive mobile menu
-- Breadcrumbs
-
-#### 🚧 Fase 4: Dashboard con Métricas (Pendiente)
-- Total de pedidos (hoy, semana, mes)
-- Revenue total por período
-- Productos más vendidos (top 5)
-- Gráfico de ventas por día
-- Pedidos pendientes
-
-#### 🚧 Fase 5: Gestión de Pedidos (Pendiente)
-- Lista de pedidos con paginación
-- Filtros por estado y fecha
-- Ver detalles de pedido
-- Cambiar estado de pedido
-- Export CSV
-
-### Credenciales de Supabase
-
-```env
-VITE_SUPABASE_URL=https://lcojyculicexqcpugrdf.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-### Credenciales de Acceso al Panel Admin
-
-**Usuario de Prueba**:
-```
-Email: admin@demo1.com
-Password: AdminDemo123!
-URL Local: http://localhost:5173
-Tenant: Tienda Demo 1 (demo1)
-```
-
-**Nota**: El usuario fue creado usando el método oficial de Supabase Dashboard (Authentication > Users > Add user). Este es el método correcto que garantiza compatibilidad con `signInWithPassword()`.
-
-### Instalación y Uso
-
-```bash
-# Ir al directorio del panel admin
-cd admin-panel
-
-# Instalar dependencias
-pnpm install
-
-# Configurar variables de entorno
-cp .env.example .env.local
-# Editar .env.local con credenciales de Supabase
-
-# Iniciar servidor de desarrollo
-pnpm dev
-# Abre http://localhost:5173
-
-# Build para producción
-pnpm build
-```
-
-### Documentación Completa
-
-Para más detalles sobre el panel administrativo, consulta:
-- 📖 **[Panel Administrativo - Guía Completa](/docs/PANEL_ADMIN_GUIA.md)**
-- 📖 **[Supabase Schema y RLS Policies](/docs/SUPABASE_SCHEMA.md)**
+### Infraestructura
+- Cloudflare Pages (gratis, ilimitado)
+- Supabase ($0-25/mes)
+- Mercado Pago (integrado)
 
 ---
 
@@ -334,116 +417,55 @@ Para más detalles sobre el panel administrativo, consulta:
 - pnpm >= 8.x
 - Cuenta de Supabase (gratis)
 
-### 1. Clonar el repositorio
+### Pasos
+
+1. **Clonar el repositorio**
 ```bash
 git clone https://github.com/tu-usuario/quality_ecommerce.git
 cd quality_ecommerce
 ```
 
-### 2. Instalar dependencias del Frontend (Tienda)
+2. **Instalar dependencias del Frontend**
 ```bash
 cd frontend
 pnpm install
-```
-
-### 3. Configurar variables de entorno del Frontend
-```bash
 cp .env.example .env
+# Editar .env con tus variables
+pnpm dev  # http://localhost:4321
 ```
 
-Edita `.env` y configura:
-- `PUBLIC_API_CONTABLE_URL` - URL de tu API contable
-- `PUBLIC_SITE_URL` - URL pública de tu sitio
-- `MP_ACCESS_TOKEN` - Access Token de Mercado Pago
-
-### 4. Instalar dependencias del Panel Admin
+3. **Instalar dependencias del Admin Panel**
 ```bash
 cd ../admin-panel
 pnpm install
-```
-
-### 5. Configurar variables de entorno del Panel Admin
-```bash
 cp .env.example .env.local
+# Editar .env.local con credenciales Supabase
+pnpm dev  # http://localhost:5173
 ```
 
-Edita `.env.local` con las credenciales de Supabase:
-- `VITE_SUPABASE_URL` - URL de tu proyecto Supabase
-- `VITE_SUPABASE_ANON_KEY` - Anon Key de Supabase
-
-### 6. Configurar Supabase
-
-1. Crea un proyecto en [Supabase](https://supabase.com)
-2. Ejecuta el schema SQL desde `docs/supabase_migration_part1.sql` y `part2.sql`
-3. Habilita Email Provider en Authentication > Settings
-4. Crea un usuario de prueba en Supabase Dashboard:
-   - Email: `admin@demo1.com`
-   - Password: (tu contraseña segura)
-
-### 7. Iniciar servidores de desarrollo
-
-**Terminal 1 - Frontend (Tienda):**
-```bash
-cd frontend
-pnpm dev
-# Abre http://localhost:4321
-```
-
-**Terminal 2 - Panel Admin:**
-```bash
-cd admin-panel
-pnpm dev
-# Abre http://localhost:5173
-```
+4. **Configurar Supabase**
+   - Ejecutar migraciones SQL desde `docs/supabase_migration_*.sql`
+   - Crear usuario admin en Supabase Dashboard
+   - Configurar variables de entorno
 
 ---
 
-## 🎨 Sistema de Temas
+## 🎨 Sistema de Temas Dinámicos
 
-El proyecto incluye un sistema de temas dinámicos almacenados en Supabase.
-
-### Temas Incluidos
-1. **Default** - Tema principal con colores azul/morado
-2. **Black Friday** - Tema oscuro con rojo y amarillo
-3. **Navidad** - Tema festivo con rojo y verde
-
-### Cómo Funciona
-- Los temas se almacenan en la tabla `themes` de Supabase
-- El `ThemeProvider` inyecta CSS Variables dinámicamente
-- Tailwind CSS consume estas variables para estilizar componentes
-- Los cambios se reflejan inmediatamente sin rebuild
+- **3 temas incluidos**: Default, Black Friday, Navidad
+- **CSS Variables dinámicas** inyectadas por ThemeProvider
+- **Cambios en tiempo real** sin rebuild necesario
+- **Multi-tenant**: Cada tenant puede activar su tema
 
 ---
 
-## 💳 Mercado Pago
+## 💳 Integración Mercado Pago
 
-### Configuración
-1. Crea una cuenta en [Mercado Pago Developers](https://www.mercadopago.com.co/developers)
-2. Obtén tus credenciales de prueba y producción
-3. Configura las URLs de retorno en `.env`:
-   - `PUBLIC_SITE_URL` - URL pública de tu sitio (debe ser HTTPS)
-
-### Flujo de Pago
-1. Usuario completa el checkout
-2. Se crea una preferencia de Mercado Pago
-3. Usuario es redirigido a Mercado Pago
-4. Webhook confirma el pago
-5. Usuario retorna a página de éxito/pendiente/error
-
----
-
-## 📊 Tipos TypeScript
-
-El proyecto incluye tipado completo para:
-- `Product` - Productos del catálogo
-- `ProductCategory` - Categorías
-- `Theme` - Configuración de temas
-- `SiteConfig` - Configuración del sitio
-- `Cart` - Carrito de compras
-- `Order` - Pedidos
-- `User` - Usuarios (Supabase Auth)
-
-Ver `frontend/src/types/` y `admin-panel/src/types/` para todos los tipos disponibles.
+- **SDK oficial** de Mercado Pago
+- **Tokens dinámicos** por tenant desde Supabase
+- **Checkout seguro** con preferencias
+- **Webhooks** para confirmación de pagos
+- **Multi-tenant**: Cada tenant con sus credenciales
 
 ---
 
@@ -451,74 +473,39 @@ Ver `frontend/src/types/` y `admin-panel/src/types/` para todos los tipos dispon
 
 ### Guías Completas
 
-Hemos creado guías paso a paso para el deployment de la arquitectura multi-tenant:
-
-- 📖 **[Deployment en Cloudflare Pages (Frontend)](/docs/DEPLOYMENT_CLOUDFLARE.md)** - Astro SSR
-- 📖 **[Configuración Multi-Dominio](/docs/DOMAIN_SETUP.md)** - DNS y SSL para múltiples clientes
-- 📖 **[Onboarding de Clientes](/docs/CLIENT_ONBOARDING.md)** - Proceso completo de agregar un nuevo cliente
-
-### Quick Start - Deployment
-
-#### 1. Frontend (Cloudflare Pages)
-```bash
-# Sigue la guía completa en /docs/DEPLOYMENT_CLOUDFLARE.md
-
-1. Crear proyecto en Cloudflare Pages
-2. Conectar GitHub repo (carpeta: frontend)
-3. Configurar build: pnpm build (output: dist)
-4. Configurar variables de entorno
-5. Deploy automático ✓
-```
-
-#### 2. Panel Admin (Cloudflare Pages)
-```bash
-# Similar al frontend, pero con carpeta: admin-panel
-
-1. Crear proyecto en Cloudflare Pages
-2. Conectar GitHub repo (carpeta: admin-panel)
-3. Configurar build: pnpm build (output: dist)
-4. Configurar variables de entorno (Supabase)
-5. Deploy automático ✓
-```
-
-#### 3. Multi-Dominio
-```bash
-# Sigue la guía completa en /docs/DOMAIN_SETUP.md
-
-1. Configurar wildcard DNS: *.miapp.com → cloudflare pages
-2. Agregar dominios custom de clientes
-3. SSL automático por Cloudflare
-```
+- 📖 [Deployment en Cloudflare Pages (Frontend)](/docs/DEPLOYMENT_CLOUDFLARE.md)
+- 📖 [Configuración Multi-Dominio](/docs/DOMAIN_SETUP.md)
+- 📖 [Panel Admin - Guía Completa](/docs/PANEL_ADMIN_GUIA.md)
 
 ### Costos de Infraestructura
 
 | Tenants | Infraestructura | Costo/mes | Por Tenant |
 |---------|-----------------|-----------|------------|
-| 1-100 | Supabase Free + Cloudflare Free | $0 | $0 |
-| 100-400 | Supabase Pro + Cloudflare Free | $25 | $0.06 |
-| 400+ | Supabase Pro + Cloudflare Pro | $45 | $0.08 |
+| 1-100 | Supabase Free + CF Free | $0 | $0 |
+| 100-400 | Supabase Pro + CF Free | $25 | $0.06 |
+| 400+ | Supabase Pro + CF Pro | $45 | $0.08 |
 
-**Ahorro vs arquitectura tradicional**: 96% ($2000/mes → $45/mes para 400 tenants)
+**Ahorro vs arquitectura tradicional**: 96% ($2000/mes → $45/mes)
 
 ---
 
 ## 📝 Scripts Disponibles
 
-### Frontend (Tienda)
+### Frontend
 ```bash
 cd frontend
-pnpm dev          # Servidor de desarrollo
-pnpm build        # Build para producción
+pnpm dev          # Desarrollo
+pnpm build        # Build producción
 pnpm preview      # Preview del build
 ```
 
-### Panel Admin
+### Admin Panel
 ```bash
 cd admin-panel
-pnpm install      # Instalar dependencias
-pnpm dev          # Servidor de desarrollo (http://localhost:5173)
-pnpm build        # Build para producción
+pnpm dev          # Desarrollo (http://localhost:5173)
+pnpm build        # Build producción
 pnpm preview      # Preview del build
+pnpm lint         # ESLint
 ```
 
 ---
@@ -526,12 +513,12 @@ pnpm preview      # Preview del build
 ## 🔐 Seguridad
 
 - ✅ Variables de entorno para secrets
-- ✅ Validación de webhooks de Mercado Pago
 - ✅ Autenticación JWT con Supabase Auth
 - ✅ Row Level Security (RLS) para multi-tenant
-- ✅ Políticas RLS en todas las tablas
+- ✅ 12 policies RLS en todas las tablas
 - ✅ CORS configurado
 - ✅ Sesiones persistentes y seguras
+- ✅ Validación de webhooks de Mercado Pago
 
 ---
 
@@ -541,30 +528,100 @@ pnpm preview      # Preview del build
 - ✅ SSR para contenido dinámico
 - ✅ Lazy loading de imágenes
 - ✅ Code splitting automático
-- ✅ Caché agresivo de datos
-- ✅ Vistas optimizadas en Supabase
-- ✅ Índices de base de datos
+- ✅ Caché en múltiples niveles
+- ✅ Vistas pre-calculadas en Supabase
+- ✅ 11 índices de base de datos
 
 ---
 
-## 🔧 Notas Técnicas y Troubleshooting
+## 🎯 Estado Actual del Proyecto
+
+### ✅ Completado (87%)
+
+**Frontend (Tienda E-commerce)**:
+- [x] Estructura base del proyecto
+- [x] Sistema de temas dinámicos
+- [x] Catálogo de productos
+- [x] Carrito de compras persistente
+- [x] Detección multi-tenant automática
+- [x] Layouts principales (Header, Footer, Navigation)
+- [x] Sistema de filtros y búsqueda
+- [x] Home completo con banner carousel
+- [x] Responsive mobile
+
+**Backend (Supabase)**:
+- [x] Migración completa de Strapi a Supabase
+- [x] Schema PostgreSQL con 4 tablas
+- [x] Row Level Security (12 policies)
+- [x] 5 vistas optimizadas
+- [x] 11 índices de performance
+- [x] Seed data inicial
+
+**Admin Panel**:
+- [x] Fase 0: Setup Inicial
+- [x] Fase 1: Supabase Setup
+- [x] Fase 2: Autenticación
+- [x] Fase 3: Layout y Navegación
+- [x] Fase 4: Dashboard con Métricas
+- [x] Fase 5: Gestión de Pedidos
+- [x] Fase 6: Gestión de Temas
+- [x] Fase 7: Configuración de Sitio
+
+### 🚧 En Desarrollo
+
+- 🚧 **Checkout con Mercado Pago** (frontend)
+  - API Routes
+  - Webhooks
+  - Páginas de resultado
+
+### ⏳ Pendiente (13%)
+
+- [ ] Fase 8: Testing y Deploy (Admin Panel)
+- [ ] Autenticación de usuarios (Frontend)
+- [ ] Dashboard de usuario (Frontend)
+- [ ] Emails transaccionales
+- [ ] Testing E2E completo
+- [ ] Deploy en producción
+
+---
+
+## 🏗️ Próximos Pasos Inmediatos
+
+1. ✅ **Componentes de productos** - COMPLETADO
+2. ✅ **Carrito de compras** - COMPLETADO
+3. ✅ **Migración a Supabase** - COMPLETADO
+4. ✅ **Admin Panel Fases 2-7** - COMPLETADO
+5. 🚧 **Checkout con Mercado Pago** - EN DESARROLLO
+6. ⏳ **Testing manual del admin panel** - SIGUIENTE
+7. ⏳ **Deploy admin panel en Cloudflare Pages** - SIGUIENTE
+8. ⏳ **Deploy frontend en producción** - SIGUIENTE
+
+---
+
+## 📝 Migración Strapi → Supabase
+
+**Completada exitosamente** ✅
+
+- Migración de todas las tablas a PostgreSQL
+- Implementación de RLS para multi-tenant
+- Variables de entorno obsoletas (STRAPI_URL) en frontend pueden eliminarse
+- Archivos de migración SQL disponibles en `/docs`
+
+---
+
+## 📚 Documentación Completa
 
 ### Panel Administrativo
+- 📖 [Panel Administrativo - Guía Completa](/docs/PANEL_ADMIN_GUIA.md)
+- 📖 [Supabase Schema y RLS Policies](/docs/SUPABASE_SCHEMA.md)
 
-#### ✅ Creación de Usuarios Admin
+### Deployment y Configuración
+- 📖 [Deployment en Cloudflare Pages (Frontend)](/docs/DEPLOYMENT_CLOUDFLARE.md)
+- 📖 [Configuración Multi-Dominio](/docs/DOMAIN_SETUP.md)
 
-**Método CORRECTO**: Usar el Dashboard de Supabase o `supabase.auth.admin.createUser()`
-
-**❌ NO hacer**: Insertar directamente en `auth.users` con SQL manual (causa error "Database error querying schema")
-
-**Pasos verificados para crear usuarios**:
-1. Ir a Supabase Dashboard → Authentication → Users
-2. Click "Add user" → "Create new user"
-3. Llenar email, password, activar "Auto Confirm User"
-4. Agregar User Metadata JSON con `tenant_id`
-5. El usuario funcionará correctamente con `signInWithPassword()`
-
-**Error común**: Si intentas crear usuarios manualmente con `INSERT INTO auth.users`, obtendrás un error 500 "Database error querying schema" al hacer login. Esto sucede porque Supabase Auth requiere campos internos específicos que solo se configuran correctamente usando los métodos oficiales.
+### Arquitectura
+- 📖 [Arquitectura Multi-Tenant](/docs/MULTI_TENANT_ARCHITECTURE.md)
+- 📖 [API Reference](/docs/API_REFERENCE.md)
 
 ---
 
@@ -574,148 +631,5 @@ Propietario - Todos los derechos reservados
 
 ---
 
-## 📚 Documentación Completa
-
-### Panel Administrativo
-- 📖 [Panel Administrativo - Guía Completa](/docs/PANEL_ADMIN_GUIA.md)
-- 📖 [Migración de Strapi a Supabase](/docs/SUPABASE_MIGRATION.md)
-- 📖 [Supabase Schema y RLS Policies](/docs/SUPABASE_SCHEMA.md)
-
-### Deployment y Configuración
-- 📖 [Deployment en Cloudflare Pages (Frontend)](/docs/DEPLOYMENT_CLOUDFLARE.md)
-- 📖 [Configuración Multi-Dominio](/docs/DOMAIN_SETUP.md)
-- 📖 [Onboarding de Clientes](/docs/CLIENT_ONBOARDING.md)
-
-### Arquitectura y API
-- 📖 [Arquitectura Multi-Tenant (Detallada)](/docs/MULTI_TENANT_ARCHITECTURE.md)
-- 📖 [API Reference](/docs/API_REFERENCE.md)
-- 📖 [Testing Multi-Tenant](/docs/TESTING_MULTI_TENANT.md)
-
-### Progreso del Proyecto
-- 📊 [Implementation Progress](/IMPLEMENTATION_PROGRESS.md) - Roadmap y estado actual
-
----
-
-## 🎯 Estado Actual del Proyecto
-
-### ✅ Completado
-
-**Tienda E-commerce (Frontend):**
-- [x] Estructura base del proyecto
-- [x] Configuración de Astro + Tailwind
-- [x] Sistema de tipos TypeScript completo
-- [x] Cliente API contable con caché
-- [x] Sistema de temas dinámicos
-- [x] Componentes de productos (ProductCard, ProductGrid, ProductCarousel)
-- [x] Páginas del catálogo (index, productos, producto individual)
-- [x] Carrito de compras completo (CartDrawer, CartItem, persistencia)
-- [x] Sistema de toasts
-- [x] Layouts principales (Header, Footer, Navigation, MobileMenu)
-- [x] Sistema de filtros (CategorySidebar con rango de precio)
-- [x] Búsqueda (SearchModal)
-- [x] Scroll infinito (ProductsWithInfiniteScroll)
-- [x] Home completo (BannerCarousel, beneficios, medios de pago)
-
-**Backend (Supabase):**
-- [x] Migración de Strapi a Supabase
-- [x] Schema de PostgreSQL con 4 tablas (themes, tenants, orders, site_config)
-- [x] Row Level Security (RLS) - 12 policies
-- [x] Vistas optimizadas (orders_summary, top_products, daily_revenue, etc.)
-- [x] Índices de performance (11 índices)
-- [x] Triggers automáticos (updated_at)
-- [x] Seed data inicial
-
-**Panel Administrativo:**
-- [x] **Fase 0: Setup Inicial** ✅
-  - Proyecto Vite + React + TypeScript
-  - Tailwind CSS 4 + Shadcn/ui
-  - Path aliases configurados
-- [x] **Fase 1: Supabase Setup** ✅
-  - Base de datos creada y funcional
-  - RLS policies implementadas
-  - Vistas y triggers configurados
-- [x] **Fase 2: Autenticación** ✅ FUNCIONAL
-  - Cliente de Supabase configurado
-  - AuthProvider con Context de React
-  - LoginForm con validación Zod
-  - ProtectedRoute para rutas privadas
-  - useAuth custom hook
-  - LoginPage y DashboardPage
-  - React Router 7 configurado
-  - TanStack Query 5 configurado
-  - Build de producción exitoso
-  - ✅ Usuario admin creado correctamente (admin@demo1.com)
-  - ✅ Login funcional verificado
-  - ✅ Dashboard accesible
-  - ✅ Logout funcional
-- [x] **Fase 3: Layout y Navegación** ✅ COMPLETADA
-  - ✅ AppLayout con sidebar + header
-  - ✅ Sidebar con navegación y rutas activas
-  - ✅ Header con usuario + logout en dropdown
-  - ✅ Responsive mobile menu con Sheet
-  - ✅ Páginas placeholder para Pedidos, Temas y Configuración
-  - ✅ Navegación funcional entre todas las secciones
-  - ✅ Build de producción exitoso
-
-### 🚧 En Desarrollo
-
-**Panel Administrativo:**
-- [ ] **Fase 4: Dashboard con Métricas** (Siguiente)
-
-**Tienda E-commerce:**
-- [x] **Checkout y Mercado Pago** (En progreso)
-  - [ ] API Routes para crear preferencias
-  - [ ] Webhooks de Mercado Pago
-  - [ ] Página de checkout con formulario
-  - [ ] Páginas de resultado (success, pending, failure)
-  - [ ] Store de órdenes
-
-### 📋 Pendiente (Prioridad Media-Baja)
-
-**Panel Administrativo:**
-- [ ] **Fase 4: Dashboard con Métricas**
-  - Métricas de pedidos y revenue
-  - Gráficos con Recharts
-  - Top productos
-- [ ] **Fase 5: Gestión de Pedidos**
-  - Lista de pedidos con paginación
-  - Filtros por estado y fecha
-  - Ver detalles de pedido
-  - Cambiar estado de pedido
-  - Export CSV
-- [ ] **Fase 6: Gestión de Temas**
-  - Lista de temas
-  - Activar/desactivar temas
-  - Preview de temas
-- [ ] **Fase 7: Configuración de Sitio**
-  - Editar configuración del tenant
-  - Contacto, redes sociales, IVA
-
-**Tienda E-commerce:**
-- [ ] Componentes SEO (Schema.org, sitemap dinámico)
-- [ ] Autenticación de usuarios (login/registro)
-- [ ] Dashboard de usuario con historial de pedidos
-- [ ] Emails transaccionales
-- [ ] Testing (Unit + E2E)
-
----
-
-## 🏗️ Próximos Pasos Inmediatos
-
-1. ✅ ~~Componentes de productos~~ **COMPLETADO**
-2. ✅ ~~Carrito de compras~~ **COMPLETADO**
-3. ✅ ~~Páginas del catálogo~~ **COMPLETADO**
-4. ✅ ~~Migración a Supabase~~ **COMPLETADO**
-5. ✅ ~~Panel Admin - Fase 2: Autenticación~~ **COMPLETADO Y VERIFICADO** ✅
-6. ✅ ~~Panel Admin - Fase 3: Layout y Navegación~~ **COMPLETADO Y VERIFICADO** ✅
-7. 🚧 **Panel Admin - Fase 4: Dashboard con métricas** (Siguiente - LISTO PARA EMPEZAR)
-8. **Panel Admin - Fase 5: Gestión de pedidos**
-9. **Completar integración checkout con Mercado Pago**
-10. Implementar autenticación de usuarios en tienda
-11. Testing y optimización
-12. Despliegue a producción
-
----
-
-**Versión:** 0.3.2 (Beta) - Panel Admin Fase 3 completada y verificada
-**Última actualización:** 2025-10-14
+**Versión**: 0.8.7 (Beta) - Panel Admin Fase 7 completada - 87% del proyecto
+**Última actualización**: 2025-11-25

@@ -1,0 +1,3 @@
+{
+    "query": "query { listFields: __type(name: \"ClassificationList\") { fields { name } } groupFields: __type(name: \"ClassificationGroup\") { fields { name } } }"
+}

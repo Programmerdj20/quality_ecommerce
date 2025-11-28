@@ -34,21 +34,16 @@ const {
 // ============================================
 // DETECCIÓN DE TENANT
 // ============================================
-const domain = new URL(Astro.request.url).host;
-console.log(`🔍 Detectando tenant para dominio: ${domain}`);
+// El tenant es detectado por el middleware (src/middleware.ts)
+const { tenant: tenantContext } = Astro.locals;
 
-const tenant = await getTenantByDomain(domain);
-
-// Si no se encuentra tenant, mostrar error 404
-if (!tenant) {
-  console.error(`❌ No se encontró tenant para dominio: ${domain}`);
+// Si no se encuentra tenant (y el middleware no redirigió por alguna razón), mostrar error 404
+if (!tenantContext) {
+  console.error(`❌ No se encontró tenant en locals`);
   return Astro.redirect('/404');
 }
 
-// Convertir a TenantContext (sin tokens privados)
-const tenantContext: TenantContext = tenantToContext(tenant);
-
-console.log(`✅ Tenant detectado: ${tenantContext.nombre} (ID: ${tenantContext.id})`);
+console.log(`✅ Tenant activo: ${tenantContext.nombre} (ID: ${tenantContext.id})`);
 
 // ============================================
 // CONFIGURACIÓN DEL SITIO

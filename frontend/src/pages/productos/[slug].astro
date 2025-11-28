@@ -48,7 +48,6 @@ const productosRelacionados = PLACEHOLDER_PRODUCTS
   .filter(p => p.categoria === product.categoria && p.id !== product.id && p.activo)
   .slice(0, 4);
 ---
-
 <BaseLayout
   title={`${product.nombre} | Quality Ecommerce`}
   description={product.descripcion}

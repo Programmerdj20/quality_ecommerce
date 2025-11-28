@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'hybrid', // Permite SSR para API routes y SSG para páginas estáticas
+  output: 'server', // SSR (Server-Side Rendering) para soporte completo
   server: {
     port: 4321,
     host: true

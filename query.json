@@ -1,0 +1,14 @@
+{
+    "query": "query ($filter: StockItemFilterInput) { pageResponse: stockItemsPage(filter: $filter) { count rows { id quantity averageCost catalogItem { code name reference images { id url } } costCenter { code name } price1 { price discountMargin minimumPrice } price2 { price discountMargin minimumPrice } } } }",
+    "variables": {
+        "filter": {
+            "classificationGroupIds": [
+                1
+            ],
+            "pagination": {
+                "page": 1,
+                "pageSize": 10
+            }
+        }
+    }
+}

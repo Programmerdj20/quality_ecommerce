@@ -6,6 +6,7 @@ export interface AuthState {
   user: User | null
   session: Session | null
   loading: boolean
+  connectionError: string | null
 }
 
 export interface AuthContextType extends AuthState {
